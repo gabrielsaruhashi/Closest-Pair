@@ -1,0 +1,29 @@
+ESTIMATE of time to complete assignment: 8 hours
+
+      Time     Time
+Date  Started  Spent Work completed
+----  -------  ----  --------------
+8/31  8pm  0:45  read assignment and played several games to help me
+                     understand the rules.
+8/02   9:00am  2:20  wrote functions for determining whether a roll is
+                     three of a kind, four of a kind, and all the other
+                     lower categories
+8/04   4:45pm  1:15  wrote code to create the graph for the components
+8/05   7:05pm  2:00  discovered and corrected two logical errors; code now
+                     passes all tests except where choice is Yahtzee
+8/07  11:00am  1:35  finished debugging; program passes all public tests
+               ----
+               7:55  TOTAL time spent
+
+I discussed my solution with: Petey Salovey, Biddy Martin, and Biff Linnane
+(and watched four episodes of Futurama).
+
+Debugging the graph construction was difficult because the size of the
+graph made it impossible to check by hand.  Using asserts helped
+tremendously, as did counting the incoming and outgoing edges for
+each vertex.  The other major problem was my use of two different variables
+in the same function called _score and score.  The last bug ended up being
+using one in place of the other; I now realize the danger of having two
+variables with names varying only in punctuation -- since they both sound
+the same when reading the code back in my head it was not obvious when
+I was using the wrong one.
