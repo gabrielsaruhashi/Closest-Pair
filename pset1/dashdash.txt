@@ -1,0 +1,8 @@
+// Hi
+// How are you?
+// Good
+
+int
+main(int argc,char *argv) {
+	
+}

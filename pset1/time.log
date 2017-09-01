@@ -3,9 +3,9 @@ ESTIMATE of time to complete assignment: 8 hours
       Time     Time
 Date  Started  Spent Work completed
 ----  -------  ----  --------------
-8/31  8pm  0:45  read assignment and played several games to help me
-                     understand the rules.
-8/02   9:00am  2:20  wrote functions for determining whether a roll is
+8/31  9:30pm   2:00  read the assignment, read the PDF notes to learn how to compile a C program, wrote a basic main function that opens a file and prints each of the lines, wrote skeleton of functions needed to check for comments
+                
+9/01   10:30am  2:20  wrote functions for determining whether a roll is
                      three of a kind, four of a kind, and all the other
                      lower categories
 8/04   4:45pm  1:15  wrote code to create the graph for the components
