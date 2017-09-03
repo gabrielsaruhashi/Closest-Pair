@@ -37,7 +37,7 @@ void removeTrailingStuff() {
 				continue;
 
 			}
-			// put last character back to be read by main function
+			// put last clean character back to be read by main function
 			ungetc(ch, stdin);
 		
 			
@@ -57,12 +57,23 @@ void ignoreString() {
 		// do nothing
 	}
 }
+
+void writeMultilineComment() {
+    int ch;
+    putchar('\n');
+    removeTrailingStuff();
+    // handle case when it is an empty multiline comment
+    if ((ch = getchar()) != '\n') { // ignore newline if empty comment
+        ungetc(ch, stdin);
+    }
+}
 int main()
 {
   int ch;
   int nextChar;
   int supportCommuteChar;
   int commuteChar;
+  int nextCommuteChar;
 
   while ((ch = getchar()) != EOF)
     {
@@ -100,9 +111,52 @@ int main()
     				}
     				
     			}
-    		} else if (nextChar == '*') {
+    		} else if (nextChar == '*') { // beginning of comment
     			// remove trailing stuff
     			removeTrailingStuff();
+
+                // handles the case when it is an empty comment
+                if ((supportCommuteChar = getchar()) == EOF ||
+                    supportCommuteChar == '/') {
+                    continue;
+                } else { // else put it back de
+                    ungetc(supportCommuteChar, stdin);
+                }
+                // write to stoout until it reaches the end of commented line
+                while ((commuteChar = getchar()) != EOF) {
+                    
+                    if (commuteChar == '*') { // it might be the end of line
+                         if ((nextCommuteChar = getchar()) == '/') { // end of comment
+                            //TODO remove trailing spaces
+                            break;
+                         } else if (nextCommuteChar == EOF) { // protect yourself against EOF
+                            continue; 
+                         } else if (nextCommuteChar == '\n') {
+                            writeMultilineComment();
+                         } else { // it was not end of line
+                            putchar(commuteChar);
+                            putchar(nextCommuteChar);
+                         }
+                    // if it reaches end of line, remove trailing of new line
+                    } else if (commuteChar == '\n') { 
+                        putchar(commuteChar);
+                        // remove trailing stuff of new line
+                        removeTrailingStuff();
+
+                        // if new line is an empty comment, with end of comment
+                        // eg: *****/
+                         if ((nextCommuteChar = getchar()) == '/' ||
+                         nextCommuteChar == EOF) { // ignore char and break loop
+                            break;
+                         } else {
+                            ungetc(nextCommuteChar, stdin);
+                         }
+                        //writeMultilineComment();
+
+                    } else { // just keep writing to stdout
+                        putchar(commuteChar);
+                    }
+                }
     		}
     	}
 

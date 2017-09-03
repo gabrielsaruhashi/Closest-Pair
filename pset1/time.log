@@ -10,9 +10,8 @@ Date  Started  Spent Work completed
 9/01   3:30pm  1:30. worked on the /* and multiline comment logic. 
 
 
-9/02   1:00pm  2:00  finished core of program, but discovered my implementation with pointers was
-completely wrong
-9/02  10:30pm  1:35  finished debugging; program passes all public tests
+9/02   1:00pm  2:00  finished core of program, but discovered my implementation with pointers was completely wrong
+9/02  10:30pm  1:30  started from zero. finished algoritm to output "//" comments
                ----
                7:55  TOTAL time spent
 
