@@ -13,29 +13,29 @@ all: comments
 # How do we make hello-world?
 # The dependency line says you need to first make hello-world.o
 # and hello-library.o
-comments: comments.o comments.o
+Comments: comments.o
 # Subsequent lines starting with a TAB character give
 # commands to execute.
 # This command uses make built-in variables to avoid
 # retyping (and getting things wrong):
 # $@ = target hello-world
 # $^ = dependencies hello-world.o and hello-library.o
-$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^
 # You can put whatever commands you want.
-echo "I just built comments! Hooray!"
+	echo "I just built comments! Hooray!"
 # Here we are saying that hello-world.o and hello-library.o
 # should be rebuilt whenever their corresponding source file
 # or hello-library.h changes.
 # There are no commands attached to these dependency lines, so
 # make will have to figure out how to do that somewhere else
 # (probably from the builtin .c -> .o rule).
-comments.o: comments.c comments.h
+comments.o: comments.c
 
 # Command lines can do more than just build things. For example,
 # "make test" will rebuild hello-world (if necessary) and then run it.
-test: comments
-./comments
+test: Comments
+	./Comments
 # This lets you type "make clean" and get rid of anything you can
 # rebuild. The $(RM) variable is predefined to "rm -f"
 clean:
-$(RM) comments *.o
+	$(RM) Comments *.o

@@ -1,0 +1,8 @@
+Distance: distance.o geography.o
+	gcc -o Distance distance.o geography.o -lm
+
+distance.o: distance.c 
+	gcc -c distance.c
+
+geography.o: geography.c
+	gcc -c geography.c

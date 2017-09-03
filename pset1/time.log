@@ -5,10 +5,11 @@ Date  Started  Spent Work completed
 ----  -------  ----  --------------
 8/31  9:30pm   2:00  read the assignment, read the PDF notes to learn how to compile a C program, wrote a basic main function that opens a file and prints each of the lines, wrote skeleton of functions needed to check for comments
                 
-9/01   10:30am  2:20  wrote functions for determining whether a roll is
-                     three of a kind, four of a kind, and all the other
-                     lower categories
-8/04   4:45pm  1:15  wrote code to create the graph for the components
+9/01   10:30am 1:30 Wrote function that addresses the "//" case 
+                     
+9/01   3:30pm  1:30. worked on the /* and multiline comment logic
+
+
 8/05   7:05pm  2:00  discovered and corrected two logical errors; code now
                      passes all tests except where choice is Yahtzee
 8/07  11:00am  1:35  finished debugging; program passes all public tests
