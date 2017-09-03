@@ -1,15 +1,14 @@
 // Hi
 // How are you?
 // Good
-
-int
-main(int argc,char *argv) {
+//
+int main(int argc,char *argv) {
 	int i = 0; // comment here
 	if (5 == 5) { // yet another
 		// hi
 		//   YO
 		// IEKKEOWQ		
-		// A very very very long text bigger than lots of spaces
+		//   A very very very long text bigger than lots of spaces
 		//     many spaces
 
 		// @bro you crazy
