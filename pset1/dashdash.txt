@@ -12,5 +12,11 @@ main(int argc,char *argv) {
 		// A very very very long text bigger than lots of spaces
 		//     many spaces
 
+		// @bro you crazy
+		// ay @ nothing
+		code code // no recognition
+
+		"// try this" // UNBREAKABLE @CODE
+
 	}
 }

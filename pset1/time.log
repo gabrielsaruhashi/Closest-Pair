@@ -5,14 +5,14 @@ Date  Started  Spent Work completed
 ----  -------  ----  --------------
 8/31  9:30pm   2:00  read the assignment, read the PDF notes to learn how to compile a C program, wrote a basic main function that opens a file and prints each of the lines, wrote skeleton of functions needed to check for comments
                 
-9/01   10:30am 1:30 Wrote function that addresses the "//" case 
+9/01   10:30am 1:30 wrote function that addresses the "//" case 
                      
-9/01   3:30pm  1:30. worked on the /* and multiline comment logic
+9/01   3:30pm  1:30. worked on the /* and multiline comment logic. 
 
 
-8/05   7:05pm  2:00  discovered and corrected two logical errors; code now
-                     passes all tests except where choice is Yahtzee
-8/07  11:00am  1:35  finished debugging; program passes all public tests
+9/02   1:00pm  2:00  finished core of program, but discovered my implementation with pointers was
+completely wrong
+9/02  10:30pm  1:35  finished debugging; program passes all public tests
                ----
                7:55  TOTAL time spent
 
@@ -28,3 +28,8 @@ using one in place of the other; I now realize the danger of having two
 variables with names varying only in punctuation -- since they both sound
 the same when reading the code back in my head it was not obvious when
 I was using the wrong one.
+
+
+//QUESTIONS
+1. do all tags have alphabetical chars?
+2. remove trailing space of tag?
