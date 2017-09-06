@@ -24,23 +24,24 @@ void removeTag() {
 
 }
 
-/* ignores all trailing spaces and asterisks*/
+/* ignores all trailing spaces, asterisks, tags, and tabs until you find a valid character */
 void removeTrailingStuff() {
 	int ch;
 
 	while ((ch = getchar()) != EOF) {
 		if (ch != ' ' &&
 			ch != '*' &&
-            ch != '\u0009') {
+            ch != '\t') {
 			// check if char is not a tag
 			if (ch == '@') {
 				removeTag();
 				continue;
 
 			}
-			// put last clean character back to be read by main function
-			ungetc(ch, stdin);
-		
+            
+
+            ungetc(ch, stdin);
+            
 			
 			// break loop
 			break;
@@ -66,6 +67,8 @@ void writeMultilineComment() {
     // handle case when it is an empty multiline comment
     if ((ch = getchar()) != '\n') { // ignore newline if empty comment
         ungetc(ch, stdin);
+    } else {
+        printf("It is an empty line\n");
     }
 }
 int main()
@@ -119,6 +122,7 @@ int main()
                 // handles the case when it is an empty comment
                 if ((supportCommuteChar = getchar()) == EOF ||
                     supportCommuteChar == '/') {
+                    printf("Empty Comment in Main \n");
                     continue;
                 } else { // else put it back de
                     ungetc(supportCommuteChar, stdin);
