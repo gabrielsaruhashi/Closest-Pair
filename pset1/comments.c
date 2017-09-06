@@ -30,7 +30,8 @@ void removeTrailingStuff() {
 
 	while ((ch = getchar()) != EOF) {
 		if (ch != ' ' &&
-			ch != '*') {
+			ch != '*' &&
+            ch != '\u0009') {
 			// check if char is not a tag
 			if (ch == '@') {
 				removeTag();
@@ -127,6 +128,8 @@ int main()
                     
                     if (commuteChar == '*') { // it might be the end of line
                          if ((nextCommuteChar = getchar()) == '/') { // end of comment
+                            // newline
+                            putchar('\n');
                             //TODO remove trailing spaces
                             break;
                          } else if (nextCommuteChar == EOF) { // protect yourself against EOF

@@ -9,7 +9,7 @@ CFLAGS=-std=c99 -Wall -pedantic -g3
 # make must first make "hello-world".
 # By default the left-hand-side of the first dependency is what you
 # get if you just type "make" with no arguments.
-all: comments
+all: Comments
 # How do we make hello-world?
 # The dependency line says you need to first make hello-world.o
 # and hello-library.o
