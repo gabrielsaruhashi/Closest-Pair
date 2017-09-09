@@ -45,7 +45,6 @@ void removeTrailingStuff() {
                 ungetc(ch, stdin);
             }
            
-            
 			
 			// break loop
 			break;
@@ -77,12 +76,11 @@ void writeMultilineComment() {
 int main()
 {
   int ch;
-  int nextChar;
-  int supportCommuteChar;
+  int nextChar; // only used to check for a '*' or '/' after a '/' is seen
+  int supportCommuteChar; // only used to check if it an empty comment
   int commuteChar;
   int nextCommuteChar;
-  // boolean to track white space in case of tag
-  bool isWhiteSpace;
+  bool previousIsWhiteSpace; // boolean to track white space in case of tag
 
   while ((ch = getchar()) != EOF)
     {
@@ -109,16 +107,19 @@ int main()
 
     			// write to stout until it reaches the end of commented line
     			while ((commuteChar = getchar()) != EOF) {
-    				if (commuteChar != '\n' &&
-    					commuteChar != '@') {
-    					putchar(commuteChar);
-    				} else if (commuteChar == '@') {
-    					// check if next char is a word char, which indicates it is a tag
-    					removeTag();
-    				} else { // if it reaches end of comment, break the while loop
-    					putchar('\n');
-    					break;
-    				}
+
+                    // if it reaches end of comment, break the while loop
+                    if (commuteChar == '\n') {
+                        putchar(commuteChar);
+                        break;
+                    } else if (commuteChar == '@' && previousIsWhiteSpace == true) { // remove tag
+                        removeTag();
+                    } else { // else, it is a regular character, just write to stdout
+                        putchar(commuteChar);
+
+                        // if commute char is a blank space
+                        previousIsWhiteSpace = (commuteChar == ' ');
+                    }
     				
     			}
     		} else if (nextChar == '*') { // CASE - Asterisk C comment
@@ -129,9 +130,10 @@ int main()
                 if ((supportCommuteChar = getchar()) == EOF ||
                     supportCommuteChar == '/') {
                     continue;
-                } else { // else put it back de
+                } else { // else unread character from stdin
                     ungetc(supportCommuteChar, stdin);
                 }
+                
                 // write to stoout until it reaches the end of commented line
                 while ((commuteChar = getchar()) != EOF) {
                     
