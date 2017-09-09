@@ -2,45 +2,49 @@
 #include <assert.h>
 #include <stdbool.h>
 
+/* removes a tag */
 void removeTag() {
 	int ch;
 
-	// handles the case when it is an isolated tag
-	if ((ch = getchar()) == ' ') {
-		putchar('@');
-		putchar(ch);
+    // ignore all characters until you see and endofline or blank space
+	while ((ch = getchar()) != EOF) {
 
-	} else {
-		while ((ch = getchar()) != EOF &&
-			ch != ' ') {
-			// do nothing
-		}
-
-		// put back space
-		if (ch == ' ') {
-			ungetc(ch, stdin);
-		}
+		// if you find a blank space or endofline, break loop and put back character
+        if (ch == ' ' || ch == '\n') {
+            ungetc(ch, stdin);
+            break;
+        }
+        // else, do nothing with the character
 	}
+    
+
 
 }
 
 /* ignores all trailing spaces, asterisks, tags, and tabs until you find a valid character */
 void removeTrailingStuff() {
 	int ch;
-
+    // ignores blank spaces, asterisks, and 
 	while ((ch = getchar()) != EOF) {
 		if (ch != ' ' &&
 			ch != '*' &&
             ch != '\t') {
-			// check if char is not a tag
+			// if char indicates beginning of a tag, remove tag and continue loop
 			if (ch == '@') {
 				removeTag();
 				continue;
 
 			}
-            
 
-            ungetc(ch, stdin);
+            /* DANGEREUX FIX, a blank CC comment might break this 
+            * only do it for multiline comment */ 
+            // if it is the end of line character, move to next line
+            if (ch == '\n') {
+                continue;
+            } else {
+                ungetc(ch, stdin);
+            }
+           
             
 			
 			// break loop
@@ -51,6 +55,7 @@ void removeTrailingStuff() {
 	}
 }
 
+/* in case we find a string outside of a comment, ignore all its characters, eg: "// dummy comment" */
 void ignoreString() {
 	int ch;
 	// only stop when ch reaches EOF or end of string 
@@ -67,8 +72,6 @@ void writeMultilineComment() {
     // handle case when it is an empty multiline comment
     if ((ch = getchar()) != '\n') { // ignore newline if empty comment
         ungetc(ch, stdin);
-    } else {
-        printf("It is an empty line\n");
     }
 }
 int main()
@@ -78,10 +81,12 @@ int main()
   int supportCommuteChar;
   int commuteChar;
   int nextCommuteChar;
+  // boolean to track white space in case of tag
+  bool isWhiteSpace;
 
   while ((ch = getchar()) != EOF)
     {
-    	// recognize beginning of string
+    	// CASE: string - recognize beginning of string
     	if (ch == '\"') {
     		// ignore everything until end of string
     		ignoreString();
@@ -89,10 +94,11 @@ int main()
     	// recognize a possible beginning of a comment
     	if (ch == '/') {
 
-    		// if "//", just print everything until the end of the line
+    		// CASE C++ Comment - if "//", just print everything until the end of the line
     		if ((nextChar = getchar()) == '/') {
     			// remove trailing spaces and *
     			removeTrailingStuff();
+
     			// handle case when comment is empty OR only with leading spaces
     			if ((supportCommuteChar = getchar()) == EOF ||
     				supportCommuteChar == '\n') {
@@ -115,14 +121,13 @@ int main()
     				}
     				
     			}
-    		} else if (nextChar == '*') { // beginning of comment
+    		} else if (nextChar == '*') { // CASE - Asterisk C comment
     			// remove trailing stuff
     			removeTrailingStuff();
 
                 // handles the case when it is an empty comment
                 if ((supportCommuteChar = getchar()) == EOF ||
                     supportCommuteChar == '/') {
-                    printf("Empty Comment in Main \n");
                     continue;
                 } else { // else put it back de
                     ungetc(supportCommuteChar, stdin);
