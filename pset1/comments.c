@@ -110,6 +110,13 @@ int main()
                     if (commuteChar == '\n') {
                         putchar(commuteChar);
                         break;
+                    } else if (commuteChar == '\\') {
+                        if ((nextCommuteChar = getchar()) == '\n') { // ignore the the backlash newline
+                            continue;
+                        } else {
+                            putchar(commuteChar);
+                            ungetc(nextCommuteChar, stdin);
+                        }
                     } else if (commuteChar == '@' && previousIsWhiteSpace == true) { // remove tag
                         removeTag();
                     } else { // else, it is a regular character, just write to stdout
@@ -143,7 +150,7 @@ int main()
                          } else if (nextCommuteChar == EOF) { // protect yourself against EOF
                             putchar(commuteChar);
                             continue; 
-                         } else if (nextCommuteChar == '\n') {
+                         } else if (nextCommuteChar == '\n') { // remove trailing space from newline
                             putchar(commuteChar);
                             putchar(nextCommuteChar);
                             removeTrailingStuff(C_ASTERISK_COMMENT);
@@ -154,7 +161,7 @@ int main()
                             }
 
                             continue;
-                            //writeMultilineComment();
+
                          } else { // it was not end of line
                             putchar(commuteChar);
                             putchar(nextCommuteChar);
@@ -163,20 +170,28 @@ int main()
                          // update last char
                          lastChar = nextCommuteChar;
                     // if it reaches end of line, remove trailing of new line
+                    } else if (commuteChar == '\\') {
+                        if ((nextCommuteChar = getchar()) == '\n') { // ignore the the backlash newline
+                            continue;
+                        } else {
+                            putchar(commuteChar);
+                            ungetc(nextCommuteChar, stdin);
+                        }
                     } else if (commuteChar == '\n') { 
+                      
                         putchar(commuteChar);
                         // remove trailing stuff of new line
                         bool lastCharIsAsterisk = removeTrailingStuff(C_ASTERISK_COMMENT);
 
                         // if new line is an empty comment, with end of comment
                         // eg: *****/
-                         if (((nextCommuteChar = getchar()) == '/' && lastCharIsAsterisk) ||
-                         nextCommuteChar == EOF) { // ignore char and break loop
+                        if (((nextCommuteChar = getchar()) == '/' && lastCharIsAsterisk) ||
+                        nextCommuteChar == EOF) { // ignore char and break loop
                             break;
-                         } else {
+                        } else {
                             ungetc(nextCommuteChar, stdin);
-                         }
-
+                        }
+                    
                          // update last char
                          lastChar = nextCommuteChar;
 
