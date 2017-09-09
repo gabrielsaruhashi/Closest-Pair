@@ -12,6 +12,7 @@ Date  Started  Spent Work completed
 9/02  1:00pm   2:00  finished core of program, but discovered my implementation with pointers was completely wrong
 9/02  10:30pm  1:30  started from zero. finished algoritm to output "//" comments
 9/03  10:30am  1:30  finished algorithm for output "/*". Still have to test using public cases
+9/09  1:30pm
                ----
                10:00  TOTAL time spent
 
@@ -20,6 +21,7 @@ I discussed my solution with: worked by myself this time.
 My lack of attention made me lose about 5 hours working on the wrong solution with pointers. I would not say, though, that it was a waste of time because I was able to learn a lot about memory allocation, arrays, and string handling in C. It was hard to think of all possibilities at first, but after Dr. Glenn reminded us of the concept of Finite State Machines, it was easier to tackle the PSET.
 
 
-//QUESTIONS
-1. do all tags have alphabetical chars?
-2. remove trailing space of tag?
+//TODO
+
+1. tags for multiline
+3. *****/ case, but what if just /

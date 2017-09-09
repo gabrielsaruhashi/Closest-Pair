@@ -2,6 +2,8 @@
 #include <assert.h>
 #include <stdbool.h>
 
+#define C_PLUS_COMMENT 0
+#define C_ASTERISK_COMMENT 1
 /* removes a tag */
 void removeTag() {
 	int ch;
@@ -18,12 +20,13 @@ void removeTag() {
 	}
     
 
-
 }
 
 /* ignores all trailing spaces, asterisks, tags, and tabs until you find a valid character */
-void removeTrailingStuff() {
+bool removeTrailingStuff(int type) {
 	int ch;
+    bool lastCharIsAsterisk;
+    // TEST 12 PROBLEM, PUT BACK CHECK FOR EMPTY COMMENT? SOLUTION: HAVE TOW TYPES OF REMOVE TRAILING STUFF
     // ignores blank spaces, asterisks, and 
 	while ((ch = getchar()) != EOF) {
 		if (ch != ' ' &&
@@ -31,27 +34,27 @@ void removeTrailingStuff() {
             ch != '\t') {
 			// if char indicates beginning of a tag, remove tag and continue loop
 			if (ch == '@') {
+                lastCharIsAsterisk = false;
 				removeTag();
 				continue;
 
-			}
-
-            /* DANGEREUX FIX, a blank CC comment might break this 
-            * only do it for multiline comment */ 
-            // if it is the end of line character, move to next line
-            if (ch == '\n') {
+			} else if (ch == '\n' && type == C_ASTERISK_COMMENT) { // in case it is a multiline comment, ignore empty line
                 continue;
             } else {
+                // unget last character and move back to main loop now that all the trailing shitespace is gone
                 ungetc(ch, stdin);
+                // break loop
+                break;
             }
            
-			
-			// break loop
-			break;
-		}
-
-	
+		} else if (ch == '*') {
+            lastCharIsAsterisk = true;
+        } else {
+            lastCharIsAsterisk = false;
+        }
 	}
+     
+    return lastCharIsAsterisk;
 }
 
 /* in case we find a string outside of a comment, ignore all its characters, eg: "// dummy comment" */
@@ -64,21 +67,14 @@ void ignoreString() {
 	}
 }
 
-void writeMultilineComment() {
-    int ch;
-    putchar('\n');
-    removeTrailingStuff();
-    // handle case when it is an empty multiline comment
-    if ((ch = getchar()) != '\n') { // ignore newline if empty comment
-        ungetc(ch, stdin);
-    }
-}
+
+
 int main()
 {
   int ch;
   int nextChar; // only used to check for a '*' or '/' after a '/' is seen
   int supportCommuteChar; // only used to check if it an empty comment
-  int commuteChar;
+  int commuteChar; // variable used to store characters after beginning of comment is identified
   int nextCommuteChar;
   bool previousIsWhiteSpace; // boolean to track white space in case of tag
 
@@ -95,7 +91,7 @@ int main()
     		// CASE C++ Comment - if "//", just print everything until the end of the line
     		if ((nextChar = getchar()) == '/') {
     			// remove trailing spaces and *
-    			removeTrailingStuff();
+    			removeTrailingStuff(C_PLUS_COMMENT);
 
     			// handle case when comment is empty OR only with leading spaces
     			if ((supportCommuteChar = getchar()) == EOF ||
@@ -124,29 +120,39 @@ int main()
     			}
     		} else if (nextChar == '*') { // CASE - Asterisk C comment
     			// remove trailing stuff
-    			removeTrailingStuff();
+    			bool lastCharIsAsterisk = removeTrailingStuff(C_ASTERISK_COMMENT);
 
                 // handles the case when it is an empty comment
                 if ((supportCommuteChar = getchar()) == EOF ||
-                    supportCommuteChar == '/') {
+                    (lastCharIsAsterisk && supportCommuteChar == '/')) {
                     continue;
                 } else { // else unread character from stdin
                     ungetc(supportCommuteChar, stdin);
                 }
-                
+
                 // write to stoout until it reaches the end of commented line
                 while ((commuteChar = getchar()) != EOF) {
                     
-                    if (commuteChar == '*') { // it might be the end of line
+                    if (commuteChar == '*') { // it might be the end of comment
                          if ((nextCommuteChar = getchar()) == '/') { // end of comment
                             // newline
                             putchar('\n');
-                            //TODO remove trailing spaces
                             break;
                          } else if (nextCommuteChar == EOF) { // protect yourself against EOF
+                            putchar(commuteChar);
                             continue; 
                          } else if (nextCommuteChar == '\n') {
-                            writeMultilineComment();
+                            putchar(commuteChar);
+                            putchar(nextCommuteChar);
+                            removeTrailingStuff(C_ASTERISK_COMMENT);
+
+                            // handle case when it is an empty multiline comment
+                            if ((ch = getchar()) != '\n') { // ignore newline if empty comment
+                                ungetc(ch, stdin);
+                            }
+
+                            continue;
+                            //writeMultilineComment();
                          } else { // it was not end of line
                             putchar(commuteChar);
                             putchar(nextCommuteChar);
@@ -155,20 +161,20 @@ int main()
                     } else if (commuteChar == '\n') { 
                         putchar(commuteChar);
                         // remove trailing stuff of new line
-                        removeTrailingStuff();
+                        bool lastCharIsAsterisk = removeTrailingStuff(C_ASTERISK_COMMENT);
 
                         // if new line is an empty comment, with end of comment
                         // eg: *****/
-                         if ((nextCommuteChar = getchar()) == '/' ||
+                         if (((nextCommuteChar = getchar()) == '/' && lastCharIsAsterisk) ||
                          nextCommuteChar == EOF) { // ignore char and break loop
                             break;
                          } else {
                             ungetc(nextCommuteChar, stdin);
                          }
-                        //writeMultilineComment();
 
                     } else { // just keep writing to stdout
                         putchar(commuteChar);
+                        
                     }
                 }
     		}

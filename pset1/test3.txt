@@ -5,11 +5,13 @@ o@bro
 "**/"
 *@example ***hello **hello
 * @ hey
+!*ERROR 1*!
 hey @bro no tag
 dededed 
 ******/
 
-// 
+!*ERROR 2*!
+//
 // hey
 
 /*Hello World!
