@@ -76,7 +76,7 @@ int main()
   int supportCommuteChar; // only used to check if it an empty comment
   int commuteChar; // variable used to store characters after beginning of comment is identified
   int nextCommuteChar;
-  bool previousIsWhiteSpace; // boolean to track white space in case of tag
+  int lastChar;
 
   while ((ch = getchar()) != EOF)
     {
@@ -87,6 +87,8 @@ int main()
     	}
     	// recognize a possible beginning of a comment
     	if (ch == '/') {
+
+            bool previousIsWhiteSpace;
 
     		// CASE C++ Comment - if "//", just print everything until the end of the line
     		if ((nextChar = getchar()) == '/') {
@@ -157,6 +159,9 @@ int main()
                             putchar(commuteChar);
                             putchar(nextCommuteChar);
                          }
+
+                         // update last char
+                         lastChar = nextCommuteChar;
                     // if it reaches end of line, remove trailing of new line
                     } else if (commuteChar == '\n') { 
                         putchar(commuteChar);
@@ -172,9 +177,18 @@ int main()
                             ungetc(nextCommuteChar, stdin);
                          }
 
+                         // update last char
+                         lastChar = nextCommuteChar;
+
+                    } else if (commuteChar == '@' && lastChar == ' ') {
+                        removeTag();
+                        continue;
+
                     } else { // just keep writing to stdout
                         putchar(commuteChar);
-                        
+
+                        // remember last char used
+                        lastChar = commuteChar;
                     }
                 }
     		}
