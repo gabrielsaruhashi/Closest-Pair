@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #define C_PLUS_COMMENT 0
 #define C_ASTERISK_COMMENT 1
@@ -12,7 +13,7 @@ void removeTag() {
 	while ((ch = getchar()) != EOF) {
 
 		// if you find a blank space or endofline, break loop and put back character
-        if (ch == ' ' || ch == '\n') {
+        if (ch == ' ' || ch == '\n' || !isalnum(ch)) {
             ungetc(ch, stdin);
             break;
         }
@@ -47,7 +48,7 @@ bool removeTrailingStuff(int type) {
                 break;
             }
            
-		} else if (ch == '*') {
+		} else if (ch == '*') { // for multiline comments
             lastCharIsAsterisk = true;
         } else {
             lastCharIsAsterisk = false;
@@ -161,6 +162,11 @@ int main()
                             }
 
                             continue;
+
+                         } else if (nextCommuteChar == '*') { // check again
+                            putchar(commuteChar);
+                            ungetc(nextCommuteChar, stdin);
+
 
                          } else { // it was not end of line
                             putchar(commuteChar);

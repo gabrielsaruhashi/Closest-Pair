@@ -7,3 +7,18 @@ what's up
 /* yolo
 lolol \
 hi */
+
+
+/* start of the program
+****************************** yo
+*  h ey
+* nothing much
+* "*/
+
+" say something /* nothing */"
+// @nothing ay
+
+int main() {
+	do something
+}
+/* yass */
