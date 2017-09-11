@@ -16,7 +16,7 @@ void removeTag(int type) {
 	while ((ch = getchar()) != EOF) {
 
 		// if C asterisk comment, break out of the loop if */
-        if (lastLastChar == '*' & lastChar == '/' && type == C_ASTERISK_COMMENT) {
+        if (lastLastChar == '*' && lastChar == '/' && type == C_ASTERISK_COMMENT) {
              ungetc(lastChar, stdin);
              ungetc(lastLastChar,stdin);
 
@@ -77,7 +77,7 @@ void ignoreString() {
 	while ((ch = getchar()) != EOF) {
 
         // break out of the loop whn you find the end of the string
-         if (ch == '\"' & lastChar != '\\') {
+         if (ch == '\"' && lastChar != '\\') {
             break;
         }
 

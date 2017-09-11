@@ -21,8 +21,7 @@ Comments: comments.o
 # $@ = target hello-world
 # $^ = dependencies hello-world.o and hello-library.o
 	$(CC) $(CFLAGS) -o $@ $^
-# You can put whatever commands you want.
-	echo "I just built comments! Hooray!"
+
 # Here we are saying that hello-world.o and hello-library.o
 # should be rebuilt whenever their corresponding source file
 # or hello-library.h changes.
