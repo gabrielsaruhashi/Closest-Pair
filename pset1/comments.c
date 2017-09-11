@@ -61,11 +61,39 @@ bool removeTrailingStuff(int type) {
 /* in case we find a string outside of a comment, ignore all its characters, eg: "// dummy comment" */
 void ignoreString() {
 	int ch;
+    int lastChar;
 	// only stop when ch reaches EOF or end of string 
-	while ((ch = getchar()) != EOF &&
-		ch != '\"' ) {
-		// do nothing
+	while ((ch = getchar()) != EOF) {
+
+        // break out of the loop whn you find the end of the string
+         if (ch == '\"' & lastChar != '\\') {
+            break;
+        }
+
+		// do nothing but keep track of last char 
+        lastChar = ch;
 	}
+
+}
+
+void printString() {
+    int ch;
+    int lastChar;
+    // only stop when ch reaches EOF or end of string 
+    while ((ch = getchar()) != EOF) {
+
+        if (ch == '\"' & lastChar != '\\') {
+            putchar(ch);
+            break;
+        } else {
+            putchar(ch);
+            // keep track of last character
+            lastChar = ch;
+        }
+
+    
+    }
+
 }
 
 
@@ -169,8 +197,9 @@ int main()
 
 
                          } else { // it was not end of line
-                            putchar(commuteChar);
-                            putchar(nextCommuteChar);
+                            putchar(commuteChar);                          
+                            ungetc(nextCommuteChar, stdin);
+
                          }
 
                          // update last char
@@ -205,6 +234,9 @@ int main()
                         removeTag();
                         continue;
 
+                    } else if (commuteChar == '\"' && lastChar != '\\') {
+                        putchar(commuteChar);
+                        printString();
                     } else { // just keep writing to stdout
                         putchar(commuteChar);
 

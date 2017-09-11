@@ -3,20 +3,21 @@ ESTIMATE of time to complete assignment: 8 hours
       Time     Time
 Date  Started  Spent Work completed
 ----  -------  ----  --------------
-8/31  9:30pm   2:00  read the assignment, read the PDF notes to learn how to compile a C program, wrote a basic main function that opens a file and prints each of the lines, wrote skeleton of functions needed to check for comments
+8/31  9:30pm   2:00	read the assignment, read the PDF notes to learn how to compile a C program, wrote a basic main function that opens a file and prints each of the lines, wrote skeleton of functions needed to check for comments
                 
-9/03  10:30am  1:30 wrote function that addresses the "//" case 
+9/03  10:30am  1:30	wrote function that addresses the "//" case 
                      
-9/01  3:30pm   1:30. worked on the /* and multiline comment logic. 
+9/01  3:30pm   1:30	worked on the /* and multiline comment logic. 
 
-9/02  1:00pm   2:00  finished core of program, but discovered my implementation with pointers was completely wrong
-9/02  10:30pm  1:30  started from zero. finished algoritm to output "//" comments
-9/03  10:30am  1:30  finished algorithm for output "/*". Still have to test using public cases
-9/09  1:30pm   4:30  worked on tags for multiline comments, backslash before newline, 
+9/02  1:00pm   2:00	finished core of program, but discovered my implementation with pointers was completely wrong
+9/02  10:30pm  1:30	started from zero. finished algoritm to output "//" comments
+9/03  10:30am  1:30	finished algorithm for output "/*". Still have to test using public cases
+9/09  1:30pm   4:30	worked on tags for multiline comments, backslash before newline, 
+9/10  2:00pm   2:30	worked on some edge cases, especially unescaped backslashes
                ----
                14:30  TOTAL time spent
 
-I discussed my solution with: worked by myself this time.
+I discussed my solution with: Sarim Abbas.
 
 My lack of attention made me lose about 5 hours working on the wrong solution with pointers. I would not say, though, that it was a waste of time because I was able to learn a lot about memory allocation, arrays, and string handling in C. It was hard to think of all possibilities at first, but after Dr. Glenn reminded us of the concept of Finite State Machines, it was easier to tackle the PSET.
 

@@ -79,3 +79,6 @@ hello ibiza
  /* whatchoo gonna do "//ghost busters!"*/
 
  "/* hello */"
+
+
+ "hey whatsup\" // nothing much"
