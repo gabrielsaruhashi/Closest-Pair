@@ -5,21 +5,32 @@
 
 #define C_PLUS_COMMENT 0
 #define C_ASTERISK_COMMENT 1
+
 /* removes a tag */
-void removeTag() {
+void removeTag(int type) {
 	int ch;
+    int lastChar = '@';
+    int lastLastChar = '@';
 
     // ignore all characters until you see and endofline or blank space
 	while ((ch = getchar()) != EOF) {
 
-		// if you find a blank space or endofline, break loop and put back character
-        if (ch == ' ' || ch == '\n' || !isalnum(ch)) {
+		// if C asterisk comment, break out of the loop if */
+        if (lastLastChar == '*' & lastChar == '/' && type == C_ASTERISK_COMMENT) {
+             ungetc(lastChar, stdin);
+             ungetc(lastLastChar,stdin);
+
+             break;
+        } 
+        else if (ch == ' ' || ch == '\n') { // if you find a blank space or endofline, break loop and put back character
             ungetc(ch, stdin);
             break;
+        } else {
+            // just keep track of last chars, but do not write it to stdout
+            lastLastChar = lastChar;
+            lastChar = ch;
         }
-        // else, do nothing with the character
 	}
-    
 
 }
 
@@ -36,7 +47,7 @@ bool removeTrailingStuff(int type) {
 			// if char indicates beginning of a tag, remove tag and continue loop
 			if (ch == '@') {
                 lastCharIsAsterisk = false;
-				removeTag();
+				removeTag(type);
 				continue;
 
 			} else if (ch == '\n' && type == C_ASTERISK_COMMENT) { // in case it is a multiline comment, ignore empty line
@@ -75,27 +86,6 @@ void ignoreString() {
 	}
 
 }
-
-void printString() {
-    int ch;
-    int lastChar;
-    // only stop when ch reaches EOF or end of string 
-    while ((ch = getchar()) != EOF) {
-
-        if (ch == '\"' & lastChar != '\\') {
-            putchar(ch);
-            break;
-        } else {
-            putchar(ch);
-            // keep track of last character
-            lastChar = ch;
-        }
-
-    
-    }
-
-}
-
 
 
 int main()
@@ -147,7 +137,7 @@ int main()
                             ungetc(nextCommuteChar, stdin);
                         }
                     } else if (commuteChar == '@' && previousIsWhiteSpace == true) { // remove tag
-                        removeTag();
+                        removeTag(C_PLUS_COMMENT);
                     } else { // else, it is a regular character, just write to stdout
                         putchar(commuteChar);
 
@@ -231,12 +221,8 @@ int main()
                          lastChar = nextCommuteChar;
 
                     } else if (commuteChar == '@' && lastChar == ' ') {
-                        removeTag();
-                        continue;
+                        removeTag(C_ASTERISK_COMMENT);
 
-                    } else if (commuteChar == '\"' && lastChar != '\\') {
-                        putchar(commuteChar);
-                        printString();
                     } else { // just keep writing to stdout
                         putchar(commuteChar);
 

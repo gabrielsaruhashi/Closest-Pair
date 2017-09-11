@@ -58,7 +58,10 @@ hello ibiza
 /* cs203 */
 /*****cs203****/
 /*cas@203*/
-/*@cs203*/
+/*@cs203********/
+HOHOHO3
+/*comments @cpsc203!>>*/
+oi
 
 /*hello @cs203 hello*/
 /* hello @cs223 @cs223 */
@@ -80,5 +83,16 @@ hello ibiza
 
  "/* hello */"
 
-
  "hey whatsup\" // nothing much"
+  "hey whatsup\" /* nothing much"
+
+  int main() // hey
+
+
+/* boi '*/' whatup */
+// whatup bro \
+nothing much
+
+/* comment */ ONE LINE OF CODE  // more comments on the same line
+// test comment 1
+// test comment 2

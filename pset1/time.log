@@ -23,6 +23,4 @@ My lack of attention made me lose about 5 hours working on the wrong solution wi
 
 
 //TODO
-
-1. tags for multiline
-2. \ non-terminating
+1. within string and !character literals!, /* and // do not mark the beginning of a comment
