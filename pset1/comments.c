@@ -146,6 +146,12 @@ int main()
                     }
     				
     			}
+
+                // if EOF while writing comment, make new line
+                if (commuteChar == EOF) {
+                    putchar('\n');
+                }
+
     		} else if (nextChar == '*') { // CASE - Asterisk C comment
     			// remove trailing stuff
     			bool lastCharIsAsterisk = removeTrailingStuff(C_ASTERISK_COMMENT);
