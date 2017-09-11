@@ -87,6 +87,22 @@ void ignoreString() {
 
 }
 
+void ignoreCharacterLiteral() {
+    int ch;
+    int lastChar;
+    // only stop when ch reaches EOF or end of string 
+    while ((ch = getchar()) != EOF) {
+
+        // break out of the loop whn you find the end of the string
+         if (ch == '\'' && lastChar != '\\') {
+            break;
+        }
+
+        // do nothing but keep track of last char 
+        lastChar = ch;
+    }
+}
+
 
 int main()
 {
@@ -104,6 +120,10 @@ int main()
     		// ignore everything until end of string
     		ignoreString();
     	}
+
+        if (ch == '\'') {
+            ignoreCharacterLiteral();
+        }
     	// recognize a possible beginning of a comment
     	if (ch == '/') {
 
