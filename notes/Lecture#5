@@ -1,0 +1,13 @@
+whenever you pass an array of characters, they are automatically converted into a pointer to the first element
+*NOTE: this only happens in array of characters, the others are passed by value
+
+thus, char s[] = char *s
+
+char *argv[], array of pointers to characters decays into an array with a pointer to the first character.
+
+char **nums2[] {"123", "23", "3213"}
+pointer to a pointer to a character, but it decays into pointer to first character
+
+
+
+given n, 

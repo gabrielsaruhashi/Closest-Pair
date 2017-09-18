@@ -1,0 +1,23 @@
+ESTIMATE of time to complete assignment: 8 hours
+
+      Time     Time
+Date  Started  Spent Work completed
+----  -------  ----  --------------
+8/31  9:30pm   2:00	read the assignment, read the PDF notes to learn how to compile a C program, wrote a basic main function that opens a file and prints each of the lines, wrote skeleton of functions needed to check for comments
+                
+9/03  10:30am  1:30	wrote function that addresses the "//" case 
+                     
+9/01  3:30pm   1:30	worked on the /* and multiline comment logic. 
+
+9/02  1:00pm   2:00	finished core of program, but discovered my implementation with pointers was completely wrong
+9/02  10:30pm  1:30	started from zero. finished algoritm to output "//" comments
+9/03  10:30am  1:30	finished algorithm for output "/*". Still have to test using public cases
+9/09  1:30pm   4:30	worked on tags for multiline comments, backslash before newline, 
+9/10  2:00pm   2:30	worked on some edge cases, especially unescaped backslashes
+9/11  2:00pm   2:00 worked on more edge cases
+               ----
+               19:00  TOTAL time spent
+
+I discussed my solution with: Sarim Abbas.
+
+Breaking down the problem and thinking about all the edge cases was very challenging at first. First, because I was not very familiar with C, which made it hard to think of possible approaches to tackle the program. Second, I did not really plan and sketch out my solution before starting to code, which forced me to redo my work whenever I remembered of a detail or specification that I had forgotten to consider. My lack of attention made me lose about 5 hours working on the wrong solution with pointers. I would not say, though, that it was a waste of time because I was able to learn a lot about memory allocation, arrays, and string handling in C. After Dr Glenn introduced the concept of Finite State Machines, it was easier to break down all th cases, but I still had a lot of difficulty to address all the particularities of the PSET. Moreover, as I was using While loops with breaks, it was sometimes hard to keep track of everything that was going on.
