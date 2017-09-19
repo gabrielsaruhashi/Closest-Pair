@@ -29,6 +29,8 @@ bool isAP(int x, int y, int z) {
 }
 
 bool anyAPViolation(int prospectiveMember, int sizeOfArray, const int *NoAPArray) {
+	// just add the first two numbers 
+
 	// iterate through the current array to see if any pair (x, y) makes AP with z 
 	for (int j = 0; j < sizeOfArray - 1; j++) {
 		for (int k = j + 1; k < sizeOfArray; k++) {
@@ -49,26 +51,82 @@ int main(int argc, char *argv[])
 {	
 
 	int range;
-	
-	 // check for correct number of args AND a positive range
-    if (argc < 1 || 
-    	(range = atoi(argv[1])) < 0)
-    {
-        printf("Usage: NoAP n -methods\n");
-        return 1;
-    }
+	int mustHaveIntegers[argc];
+	int sizeOfMustHaveIntegers = 0;
+	int largestMustHaveInt = 0;
 
-   	while 
+	 // helper variables to go through all the arguments
+	int argcHelper = 0;
+	bool isMustHaveInteger = true;
 
+	// parse the arguments, and allocating each argument to the appropriate variable
+	do
+	{	
+		// check for at least one argument
+		//TODO change it to 2
+		if (argc == 0) {
+			printf("Usage: NoAP n -methods\n");
+		}
 
+		// first argument is the range, ensure number is non-negative
+		if (argcHelper == 1 && (range = atoi(argv[argcHelper])) < 0)
+	    {
+	        printf("NoAP: n must not be negative; was value where value is replaced by the value of nn\n");
+	        return 1;
+	    }
 
+	    // add all must-have integers to the array
+	    if (argcHelper > 1 && isMustHaveInteger == true) {
+	    	int newMustHaveInt = atoi(argv[argcHelper]);
+	    	mustHaveIntegers[sizeOfMustHaveIntegers] = newMustHaveInt ;
+
+	    	// update largest must have integer
+	    	if (newMustHaveInt > largestMustHaveInt) {
+	    		largestMustHaveInt = newMustHaveInt;
+	    	}
+	    	sizeOfMustHaveIntegers++; 
+	    }
+
+	    argcHelper++;
+	} while (argcHelper < argc);
+   
 
     int array[range];
 	int sizeOfArray = 0;
+	bool allValidMustHaveIntegers;
+
+
+
+	// go through must have integer array to make sure there are no PAs
+	for (int i = 0; i < sizeOfMustHaveIntegers; i++) {
+
+		// just add the first two numbers
+		if (sizeOfArray < 2) 
+		{ 
+			array[sizeOfArray] = mustHaveIntegers[i];
+			// keep array size updated
+			sizeOfArray += 1;
+		} else {
+			// iterate through the current array to see if any pair (x, y) makes AP with z 
+			if (!anyAPViolation(mustHaveIntegers[i], sizeOfArray, array)) {
+				array[sizeOfArray] = mustHaveIntegers[i];
+				sizeOfArray += 1;
+			} else {
+				allValidMustHaveIntegers = false;
+				printf("0 []\n");
+				break;
+			}
+		}
+
+	}
 
     /* GREEDY */
-    // iterate through the set of numbers
-    for (int prospectiveMember = 0; prospectiveMember < range; prospectiveMember++) {
+
+    // initialize prospective member according to whether or not there is 
+    int prospectiveMember = largestMustHaveInt + 1;
+
+    // iterate through the set of numbers, starting with the largest must-have int
+    for (; prospectiveMember < range; prospectiveMember++) {
     	
 		// just add the first two numbers
 		if (sizeOfArray < 2) 
@@ -87,9 +145,17 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	// output array of integers 
+	printf("[");
 	for (int i = 0; i < sizeOfArray; i ++) {
 		printf("%i", array[i]);
-		printf("%c", ',');
+
+		if (i < sizeOfArray - 1) {
+			printf("%c", ',');
+		} else {
+			printf("]\n");
+		}
+		
 	}
 
 
