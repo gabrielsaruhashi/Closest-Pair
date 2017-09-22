@@ -5,6 +5,28 @@
 #include <string.h>
 #include <ctype.h>
 
+
+bool isIntegerInArray(int val, int *arr, int size){
+    for (int i = 0; i < size; i++) {
+
+        if (arr[i] == val) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void nextSkipIteration(int range, int *currentIndex,  int skipJump, int *loopCounter) {
+	int flatSum = *currentIndex + skipJump;
+	if (flatSum >= range - 1) {
+
+		*currentIndex = flatSum - (range - 1);
+		*loopCounter += 1;
+	} else {
+		*currentIndex = flatSum;
+
+	}
+}
 bool isNumber(char number[])
 {
     int i = 0;
@@ -88,16 +110,22 @@ int main(int argc, char *argv[])
 {	
 
 	int range;
+
 	int mustHaveIntegers[argc];
 	int sizeOfMustHaveIntegers = 0;
 	int largestMustHaveInt = 0;
-
+	// store the methods
 	char *methods[4];
 	int numberOfMethods = 0;
 
 	 // helper variables to go through all the arguments
 	int argcHelper = 0;
 	bool isMustHaveInteger = true;
+
+	// keep track of whether it is a skip argument or a regular must have integer 
+	bool isSkipArgument;
+	int skipStart;
+	int skipJump;
 
 	// parse the arguments, and allocating each argument to the appropriate variable
 	do
@@ -117,7 +145,7 @@ int main(int argc, char *argv[])
 
 	    // add all must-have integers to the array
 	    //if (isdigit(atoi(argv[argcHelper])))
-	    if (argcHelper > 1 && isNumber(argv[argcHelper]))
+	    if (argcHelper > 1 && isNumber(argv[argcHelper]) && isSkipArgument == false)
 	    {
 	    	int newMustHaveInt = atoi(argv[argcHelper]);
 	    	mustHaveIntegers[sizeOfMustHaveIntegers] = newMustHaveInt ;
@@ -127,20 +155,29 @@ int main(int argc, char *argv[])
 	    		largestMustHaveInt = newMustHaveInt;
 	    	}
 	    	sizeOfMustHaveIntegers++; 
-	    } else if ((argcHelper > 1 && argv[argcHelper][0] == '-')) 
+	    } else if (argcHelper > 1 && argv[argcHelper][0] == '-')
 	    // add method to method array
-	    {
+	    {	
+	    	if (strcmp(argv[argcHelper], "-skip") == 0) {
+	    		isSkipArgument = true;
+	    		skipStart = atoi(argv[argcHelper + 1]);
+	    		skipJump = atoi(argv[argcHelper + 2]);
+	    	}
 	    	methods[numberOfMethods] = argv[argcHelper];
 	    	numberOfMethods++;
-	    }
+	    } 
 
 	    argcHelper++;
 	} while (argcHelper < argc);
 
     int array[range];
 	int sizeOfArray = 0;
+
 	int backwardArray[range];
 	int sizeOfBackwardArray = 0;
+
+	int skipArray[range];
+	int sizeOfSkipArray = 0;
 
 	int hasInvalidMustHaveIntegers = false;
 
@@ -155,17 +192,24 @@ int main(int argc, char *argv[])
 		{ 
 			array[sizeOfArray] = mustHaveIntegers[i];
 			backwardArray[sizeOfBackwardArray] = mustHaveIntegers[i];
+			skipArray[sizeOfSkipArray] = mustHaveIntegers[i];
+
 			// keep array size updated
 			sizeOfArray += 1;
 			sizeOfBackwardArray += 1;
+			sizeOfSkipArray += 1;
 		} else {
 			// iterate through the current array to see if any pair (x, y) makes AP with z 
 			if (!anyAPViolation(mustHaveIntegers[i], sizeOfArray, array)) {
 					array[sizeOfArray] = mustHaveIntegers[i];
 					backwardArray[sizeOfBackwardArray] = mustHaveIntegers[i];
+					skipArray[sizeOfSkipArray] = mustHaveIntegers[i];
+
 					// keep array size updated
 					sizeOfArray += 1;
 					sizeOfBackwardArray += 1;
+					sizeOfSkipArray += 1;
+
 
 
 			} else {
@@ -174,7 +218,6 @@ int main(int argc, char *argv[])
 				break;
 			}
 		}
-
 	}
 
    
@@ -257,8 +300,48 @@ int main(int argc, char *argv[])
 				
 			}
 
-   		}
-   	
+   		} 
+   		else if (strcmp(methods[i], "-skip") == 0) {
+   			int loopCounter = 0;
+   			for (int prospectiveSkipMember = skipStart; loopCounter < range;
+   			 nextSkipIteration(range, &prospectiveSkipMember, skipJump, &loopCounter)) {
+
+   				// just add the first two numbers
+				if (sizeOfSkipArray < 2) 
+				{ 
+					skipArray[sizeOfSkipArray] = prospectiveSkipMember;
+					// keep array size updated
+					sizeOfSkipArray += 1;
+				} 
+				else 
+				{
+
+					// iterate through the current array to see if any pair (x, y) makes AP with z 
+					if (prospectiveSkipMember > largestMustHaveInt 
+						&& !anyAPViolation(prospectiveSkipMember, sizeOfSkipArray, skipArray) 
+						&& isIntegerInArray(prospectiveSkipMember, skipArray, sizeOfSkipArray) == false) {
+						skipArray[sizeOfSkipArray] = prospectiveSkipMember;
+						sizeOfSkipArray += 1;
+					}
+				}
+   			}
+
+   			// sortprospective backward memeber
+			bubbleSort(skipArray, sizeOfSkipArray);
+
+			// output array of integers 
+			printf("-skip %i %i: %i [", skipStart, skipJump, sizeOfSkipArray);
+			for (int i = 0; i < sizeOfSkipArray; i ++) {
+				printf("%i", skipArray[i]);
+
+				if (i < sizeOfSkipArray - 1) {
+					printf("%c", ',');
+				} else {
+					printf("]\n");
+				}
+				
+			}	
+   		} 
 
    }
 
