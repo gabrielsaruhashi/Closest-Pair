@@ -17,6 +17,7 @@ bool isIntegerInArray(int val, int *arr, int size){
 }
 
 void nextSkipIteration(int range, int *currentIndex,  int skipJump, int *loopCounter) {
+	/*TODO BE ABLE TO RECOGNIZE WHEN YOU'RE REPEATING THE LOOP */
 	int flatSum = *currentIndex + skipJump;
 	if (flatSum >= range - 1) {
 
@@ -129,37 +130,52 @@ int main(int argc, char *argv[])
 	int skipStart;
 	int skipJump;
 
-	// parse the arguments, and allocating each argument to the appropriate variable
+	/**
+	* Parse the arguments.
+	* Allocate each argument to the appropriate variable 
+	*/
 	do
 	{	
 		// check for at least one argument
-		//TODO change it to 2
-		if (argc == 0) {
-			printf("Usage: NoAP n -methods\n");
+		if (argc < 2) {
+			fprintf(stderr, "Usage: NoAP n -methods\n");
+			return 1;
 		}
-
 		// first argument is the range, ensure number is non-negative
-		if (argcHelper == 1 && (range = atoi(argv[argcHelper])) < 0)
-	    {
-	        printf("NoAP: n must not be negative; was value where value is replaced by the value of nn\n");
-	        return 1;
-	    }
+		else if (argcHelper == 1 && 
+			(!isNumber(argv[argcHelper]) ||
+			(range = atoi(argv[argcHelper])) < 0))
 
+	    {
+	        fprintf(stderr, "NoAP: n must not be negative; was %i\n", range);
+	        return 2;
+	    }
 	    // add all must-have integers to the array
-	    //if (isdigit(atoi(argv[argcHelper])))
-	    if (argcHelper > 1 && isNumber(argv[argcHelper]) && isSkipArgument == false)
+	    else if (argcHelper > 1 && isNumber(argv[argcHelper]) && isSkipArgument == false)
 	    {
 	    	int newMustHaveInt = atoi(argv[argcHelper]);
+
+	    	if (newMustHaveInt > range - 1) {
+	    		fprintf(stderr, "NoAP: integer out of range %i\n", newMustHaveInt);
+	    		return 3;
+	    	}
+
+	    	// add to must have integers array
 	    	mustHaveIntegers[sizeOfMustHaveIntegers] = newMustHaveInt ;
 
 	    	// update largest must have integer
 	    	if (newMustHaveInt > largestMustHaveInt) {
 	    		largestMustHaveInt = newMustHaveInt;
 	    	}
+
+	    	// update size
 	    	sizeOfMustHaveIntegers++; 
-	    } else if (argcHelper > 1 && argv[argcHelper][0] == '-')
+	    } 
+	    else if (argcHelper > 1 && argv[argcHelper][0] == '-')
 	    // add method to method array
 	    {	
+	    	   			/*TODO SAFER WAY EXTRACT SKIP ARGUMENTS */
+
 	    	if (strcmp(argv[argcHelper], "-skip") == 0) {
 	    		isSkipArgument = true;
 	    		skipStart = atoi(argv[argcHelper + 1]);
@@ -297,6 +313,8 @@ int main(int argc, char *argv[])
 				}
 				
 			}	
+   		} else {
+   			printf("NoAP: invalid method; %s is not valid\n", methods[i]);
    		} 
 
    }
