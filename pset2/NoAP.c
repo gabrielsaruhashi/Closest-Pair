@@ -89,6 +89,9 @@ bool isAP(int x, int y, int z) {
 
 bool anyAPViolation(int prospectiveMember, int sizeOfArray, const int *NoAPArray) {
 	// just add the first two numbers 
+	if (sizeOfArray < 2) {
+		return false;
+	}
 
 	// iterate through the current array to see if any pair (x, y) makes AP with z 
 	for (int j = 0; j < sizeOfArray - 1; j++) {
@@ -120,7 +123,6 @@ int main(int argc, char *argv[])
 
 	 // helper variables to go through all the arguments
 	int argcHelper = 0;
-	bool isMustHaveInteger = true;
 
 	// keep track of whether it is a skip argument or a regular must have integer 
 	bool isSkipArgument;
@@ -186,37 +188,21 @@ int main(int argc, char *argv[])
 	// go through must have integer array to make sure there are no PAs
 	for (int i = 0; i < sizeOfMustHaveIntegers; i++) 
 	{
+		// iterate through the current array to see if any pair (x, y) makes AP with z 
+		if (!anyAPViolation(mustHaveIntegers[i], sizeOfArray, array)) {
+				array[sizeOfArray] = mustHaveIntegers[i];
+				backwardArray[sizeOfBackwardArray] = mustHaveIntegers[i];
+				skipArray[sizeOfSkipArray] = mustHaveIntegers[i];
 
-		// just add the first two numbers
-		if (sizeOfArray < 2) 
-		{ 
-			array[sizeOfArray] = mustHaveIntegers[i];
-			backwardArray[sizeOfBackwardArray] = mustHaveIntegers[i];
-			skipArray[sizeOfSkipArray] = mustHaveIntegers[i];
+				// keep array size updated
+				sizeOfArray += 1;
+				sizeOfBackwardArray += 1;
+				sizeOfSkipArray += 1;
 
-			// keep array size updated
-			sizeOfArray += 1;
-			sizeOfBackwardArray += 1;
-			sizeOfSkipArray += 1;
 		} else {
-			// iterate through the current array to see if any pair (x, y) makes AP with z 
-			if (!anyAPViolation(mustHaveIntegers[i], sizeOfArray, array)) {
-					array[sizeOfArray] = mustHaveIntegers[i];
-					backwardArray[sizeOfBackwardArray] = mustHaveIntegers[i];
-					skipArray[sizeOfSkipArray] = mustHaveIntegers[i];
-
-					// keep array size updated
-					sizeOfArray += 1;
-					sizeOfBackwardArray += 1;
-					sizeOfSkipArray += 1;
-
-
-
-			} else {
-				hasInvalidMustHaveIntegers = true;
-				printf("0 []\n");
-				break;
-			}
+			hasInvalidMustHaveIntegers = true;
+			printf("0 []\n");
+			break;
 		}
 	}
 
@@ -231,21 +217,12 @@ int main(int argc, char *argv[])
 		    // iterate through the set of numbers, starting with the largest must-have int
 		    for (; prospectiveMember < range; prospectiveMember++) {
 		    	
-				// just add the first two numbers
-				if (sizeOfArray < 2) 
-				{ 
+				// iterate through the current array to see if any pair (x, y) makes AP with z 
+				if (!anyAPViolation(prospectiveMember, sizeOfArray, array)) {
 					array[sizeOfArray] = prospectiveMember;
-					// keep array size updated
 					sizeOfArray += 1;
-				} 
-				else 
-				{
-					// iterate through the current array to see if any pair (x, y) makes AP with z 
-					if (!anyAPViolation(prospectiveMember, sizeOfArray, array)) {
-						array[sizeOfArray] = prospectiveMember;
-						sizeOfArray += 1;
-					}
 				}
+				
 			}
 
 			// output array of integers 
@@ -265,22 +242,11 @@ int main(int argc, char *argv[])
 
 			int prospectiveBackWardMember = range - 1;
 			for (; prospectiveBackWardMember > largestMustHaveInt; prospectiveBackWardMember--) {
-
-				// just add the first two numbers
-				if (sizeOfBackwardArray < 2) 
-				{ 
-					backwardArray[sizeOfBackwardArray] = prospectiveBackWardMember;
-					// keep array size updated
-					sizeOfBackwardArray += 1;
-				} 
-				else 
-				{
 					// iterate through the current array to see if any pair (x, y) makes AP with z 
 					if (!anyAPViolation(prospectiveBackWardMember, sizeOfBackwardArray, backwardArray)) {
 						backwardArray[sizeOfBackwardArray] = prospectiveBackWardMember;
 						sizeOfBackwardArray += 1;
 					}
-				}
 			}
 
 			// sortprospective backward memeber
@@ -306,16 +272,6 @@ int main(int argc, char *argv[])
    			for (int prospectiveSkipMember = skipStart; loopCounter < range;
    			 nextSkipIteration(range, &prospectiveSkipMember, skipJump, &loopCounter)) {
 
-   				// just add the first two numbers
-				if (sizeOfSkipArray < 2) 
-				{ 
-					skipArray[sizeOfSkipArray] = prospectiveSkipMember;
-					// keep array size updated
-					sizeOfSkipArray += 1;
-				} 
-				else 
-				{
-
 					// iterate through the current array to see if any pair (x, y) makes AP with z 
 					if (prospectiveSkipMember > largestMustHaveInt 
 						&& !anyAPViolation(prospectiveSkipMember, sizeOfSkipArray, skipArray) 
@@ -323,7 +279,7 @@ int main(int argc, char *argv[])
 						skipArray[sizeOfSkipArray] = prospectiveSkipMember;
 						sizeOfSkipArray += 1;
 					}
-				}
+				
    			}
 
    			// sortprospective backward memeber
@@ -344,25 +300,4 @@ int main(int argc, char *argv[])
    		} 
 
    }
-
-    
-	// format string 
-		
-
 }
-
-
-// only jhave AP if there is 
-// start from 0, see if adding next number creates AP
-
-
-// for each number z to consider
-	// if any pair x,y already selected makes AP xyz zxy xzy
-		// dont add 
-	// else 
-		// add z
-
-
-// have an array that stores all numbers already selected
-
-// function to check if three numbers are an arithmetic progression (return bool)
