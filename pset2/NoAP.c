@@ -112,15 +112,16 @@ void backtrackNoAP(int optArray[], int partialArray[],
 	int *partialSize, int *optSize, 
 	int *lastChoice, int baseNumber, int range) {
 
+	//printf("New Recursion starting at %i \n", *lastChoice);
+
 	int initialChoice = *lastChoice + 1;
 
 	// (range - *prospectiveOpt) < *optSize
 	for (int prospectiveOpt = initialChoice; prospectiveOpt <= range; prospectiveOpt++) 
-    {		
+    {	
 		// end backtracking when 
 		if (baseNumber == prospectiveOpt)
 		{
-			//printf("Base Case Exit \n");
 			// print
 			printf("-opt: %i [", *optSize);
 
@@ -139,10 +140,12 @@ void backtrackNoAP(int optArray[], int partialArray[],
 		// when finishes going over the entire range
 		else if (prospectiveOpt == range) 
 		{
-			printf("End of iteration will remove %i since initial choice was %i\n", partialArray[*partialSize - 1], initialChoice);
+			//printf("End of iteration will remove %i since initial choice was %i\n", partialArray[*partialSize - 1], initialChoice);
 
+			// update array
 			if (*partialSize > *optSize) 
 			{
+				//printf("/*NEW LONGEST*/\n");
 				// copy content of partial to official array
 				for (int i = 0; i < *partialSize; i++) {
 					optArray[i] = partialArray[i];
@@ -151,12 +154,14 @@ void backtrackNoAP(int optArray[], int partialArray[],
 				*optSize = *partialSize;
 			}
 
+
 			*lastChoice = partialArray[*partialSize - 1];
 			// remove last choice
 			//partialArray[*partialSize - 1] = NULL;
 			*partialSize -= 1;
 
-			if (*lastChoice == baseNumber) {
+			// exit if it reaches baseNumber or empty array
+			if (*lastChoice == baseNumber || *partialSize == 0) {
 				//printf("Base Case Exit \n");
 				// print
 				printf("-opt: %i [", *optSize);
@@ -174,7 +179,6 @@ void backtrackNoAP(int optArray[], int partialArray[],
 				return;
 			}
 			// the first lastChoice is just to keep track of numerical value for next prospective opt
-			/* TODO FIGURE OUT WHY NO STAR FOR INTS */
 			backtrackNoAP(optArray, partialArray, 
 				partialSize, optSize, 
 				lastChoice, baseNumber, range);
@@ -182,19 +186,18 @@ void backtrackNoAP(int optArray[], int partialArray[],
 		
 		else 
 		{
-			//printf("Same iteration \n");
 			if (!anyAPViolation(prospectiveOpt, *partialSize, partialArray)) 
 			{	
 				*lastChoice = prospectiveOpt;
 				partialArray[*partialSize] = prospectiveOpt;
 				*partialSize += 1;
-				printf("ADDED %i, current partial array is", prospectiveOpt);
+				/*printf("ADDED %i, current partial array of size %i is", prospectiveOpt, *partialSize);
 				for (int i = 0; i < *partialSize; i++) {
 					printf(" %i ", partialArray[i]);
 				}
-				printf("\n");
+				printf("\n"); */
 			} else {
-				printf("IGNORED %i\n", prospectiveOpt);
+				//printf("IGNORED %i\n", prospectiveOpt);
 			}
 		}
 	}
@@ -370,7 +373,7 @@ int main(int argc, char *argv[])
 				
 			}
    		} 
-   		else if (strcmp(methods[i], "-backward") == 0) 
+   		else if (strcmp(methods[i], "-backwards") == 0) 
    		{
    			/*********** BACKWARD ***********/
 
@@ -390,7 +393,7 @@ int main(int argc, char *argv[])
 
 
 			// output array of integers 
-			printf("-backward: %i [", sizeOfBackwardArray);
+			printf("-backwards: %i [", sizeOfBackwardArray);
 			for (int i = 0; i < sizeOfBackwardArray; i ++) 
 			{
 				printf("%i", backwardArray[i]);
