@@ -156,6 +156,23 @@ void backtrackNoAP(int optArray[], int partialArray[],
 			//partialArray[*partialSize - 1] = NULL;
 			*partialSize -= 1;
 
+			if (*lastChoice == baseNumber) {
+				//printf("Base Case Exit \n");
+				// print
+				printf("-opt: %i [", *optSize);
+
+				for (int i = 0; i < *optSize; i++) {
+					printf("%i", optArray[i]);
+
+					if (i < *optSize - 1) {
+						printf("%c", ',');
+					} else {
+						printf("]\n");
+					}
+				}
+				// copy the content of partial to official array
+				return;
+			}
 			// the first lastChoice is just to keep track of numerical value for next prospective opt
 			/* TODO FIGURE OUT WHY NO STAR FOR INTS */
 			backtrackNoAP(optArray, partialArray, 
