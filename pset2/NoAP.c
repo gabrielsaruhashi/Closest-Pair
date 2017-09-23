@@ -6,7 +6,7 @@
 #include <ctype.h>
 
 
-bool isIntegerInArray(int val, int *arr, int size){
+bool isIntegerInArray(int val, const int *arr, int size){
     for (int i = 0; i < size; i++) {
 
         if (arr[i] == val) {
@@ -16,7 +16,7 @@ bool isIntegerInArray(int val, int *arr, int size){
     return false;
 }
 
-void nextSkipIteration(int range, int *currentIndex,  int skipJump, int *loopCounter) {
+void nextSkipIteration(int range, int *currentIndex, int skipJump, int *loopCounter) {
 	/*TODO BE ABLE TO RECOGNIZE WHEN YOU'RE REPEATING THE LOOP */
 	int flatSum = *currentIndex + skipJump;
 	if (flatSum >= range - 1) {
@@ -28,7 +28,8 @@ void nextSkipIteration(int range, int *currentIndex,  int skipJump, int *loopCou
 
 	}
 }
-bool isNumber(char number[])
+
+bool isNumber(const char number[])
 {
     int i = 0;
 
@@ -106,6 +107,83 @@ bool anyAPViolation(int prospectiveMember, int sizeOfArray, const int *NoAPArray
 	return false;
 }
 
+
+void backtrackNoAP(int optArray[], int partialArray[],
+	int *partialSize, int *optSize, 
+	int *lastChoice, int baseNumber, int range) {
+
+	int initialChoice = *lastChoice + 1;
+
+	// (range - *prospectiveOpt) < *optSize
+	for (int prospectiveOpt = initialChoice; prospectiveOpt <= range; prospectiveOpt++) 
+    {		
+		// end backtracking when 
+		if (baseNumber == prospectiveOpt)
+		{
+			//printf("Base Case Exit \n");
+			// print
+			printf("-opt: %i [", *optSize);
+
+			for (int i = 0; i < *optSize; i++) {
+				printf("%i", optArray[i]);
+
+				if (i < *optSize - 1) {
+					printf("%c", ',');
+				} else {
+					printf("]\n");
+				}
+			}
+			// copy the content of partial to official array
+			return;
+		}
+		// when finishes going over the entire range
+		else if (prospectiveOpt == range) 
+		{
+			printf("End of iteration will remove %i since initial choice was %i\n", partialArray[*partialSize - 1], initialChoice);
+
+			if (*partialSize > *optSize) 
+			{
+				// copy content of partial to official array
+				for (int i = 0; i < *partialSize; i++) {
+					optArray[i] = partialArray[i];
+				}
+				// update size counter
+				*optSize = *partialSize;
+			}
+
+			*lastChoice = partialArray[*partialSize - 1];
+			// remove last choice
+			//partialArray[*partialSize - 1] = NULL;
+			*partialSize -= 1;
+
+			// the first lastChoice is just to keep track of numerical value for next prospective opt
+			/* TODO FIGURE OUT WHY NO STAR FOR INTS */
+			backtrackNoAP(optArray, partialArray, 
+				partialSize, optSize, 
+				lastChoice, baseNumber, range);
+		}
+		
+		else 
+		{
+			//printf("Same iteration \n");
+			if (!anyAPViolation(prospectiveOpt, *partialSize, partialArray)) 
+			{	
+				*lastChoice = prospectiveOpt;
+				partialArray[*partialSize] = prospectiveOpt;
+				*partialSize += 1;
+				printf("ADDED %i, current partial array is", prospectiveOpt);
+				for (int i = 0; i < *partialSize; i++) {
+					printf(" %i ", partialArray[i]);
+				}
+				printf("\n");
+			} else {
+				printf("IGNORED %i\n", prospectiveOpt);
+			}
+		}
+	}
+
+}
+
 /* The first argument n is required and will be the decimal representation of a nonnegative integer; 
 the range of values in the set to construct is then 0,…,n−10,…,n−1. You may assume 
 that nn is small enough so that you can create several arrays of nn integers as necessary. */
@@ -137,7 +215,8 @@ int main(int argc, char *argv[])
 	do
 	{	
 		// check for at least one argument
-		if (argc < 2) {
+		if (argc < 2) 
+		{
 			fprintf(stderr, "Usage: NoAP n -methods\n");
 			return 1;
 		}
@@ -155,7 +234,8 @@ int main(int argc, char *argv[])
 	    {
 	    	int newMustHaveInt = atoi(argv[argcHelper]);
 
-	    	if (newMustHaveInt > range - 1) {
+	    	if (newMustHaveInt > range - 1) 
+	    	{
 	    		fprintf(stderr, "NoAP: integer out of range %i\n", newMustHaveInt);
 	    		return 3;
 	    	}
@@ -197,6 +277,11 @@ int main(int argc, char *argv[])
 	int skipArray[range];
 	int sizeOfSkipArray = 0;
 
+	int optArray[range];
+	int sizeOfOptArray = 0;
+	int partialOptArray[range];
+	int sizeOfPartial = 0;
+
 	int hasInvalidMustHaveIntegers = false;
 
 
@@ -205,17 +290,24 @@ int main(int argc, char *argv[])
 	for (int i = 0; i < sizeOfMustHaveIntegers; i++) 
 	{
 		// iterate through the current array to see if any pair (x, y) makes AP with z 
-		if (!anyAPViolation(mustHaveIntegers[i], sizeOfArray, array)) {
+		if (!anyAPViolation(mustHaveIntegers[i], sizeOfArray, array)) 
+		{
 				array[sizeOfArray] = mustHaveIntegers[i];
 				backwardArray[sizeOfBackwardArray] = mustHaveIntegers[i];
 				skipArray[sizeOfSkipArray] = mustHaveIntegers[i];
+				optArray[sizeOfOptArray] = mustHaveIntegers[i];
+				partialOptArray[sizeOfOptArray] = mustHaveIntegers[i];
 
 				// keep array size updated
 				sizeOfArray += 1;
 				sizeOfBackwardArray += 1;
 				sizeOfSkipArray += 1;
+				sizeOfOptArray += 1;
+				sizeOfPartial += 1;
 
-		} else {
+		} 
+		else 
+		{
 			hasInvalidMustHaveIntegers = true;
 			printf("0 []\n");
 			break;
@@ -225,16 +317,19 @@ int main(int argc, char *argv[])
    
    for (int i = 0; i < numberOfMethods; i++) {
 
-   		if (strcmp(methods[i], "-greedy") == 0) {
+   		if (strcmp(methods[i], "-greedy") == 0) 
+   		{
    			// initialize prospective member according to whether or not there is 
 		    int prospectiveMember = largestMustHaveInt + 1;
 
 		     /*********** GREEDY ***********/
 		    // iterate through the set of numbers, starting with the largest must-have int
-		    for (; prospectiveMember < range; prospectiveMember++) {
+		    for (; prospectiveMember < range; prospectiveMember++) 
+		    {
 		    	
 				// iterate through the current array to see if any pair (x, y) makes AP with z 
-				if (!anyAPViolation(prospectiveMember, sizeOfArray, array)) {
+				if (!anyAPViolation(prospectiveMember, sizeOfArray, array)) 
+				{
 					array[sizeOfArray] = prospectiveMember;
 					sizeOfArray += 1;
 				}
@@ -243,23 +338,31 @@ int main(int argc, char *argv[])
 
 			// output array of integers 
 			printf("-greedy: %i [", sizeOfArray);
-			for (int i = 0; i < sizeOfArray; i ++) {
+			for (int i = 0; i < sizeOfArray; i ++) 
+			{
 				printf("%i", array[i]);
 
-				if (i < sizeOfArray - 1) {
+				if (i < sizeOfArray - 1) 
+				{
 					printf("%c", ',');
-				} else {
+				} 
+				else
+				{
 					printf("]\n");
 				}
 				
 			}
-   		} else if (strcmp(methods[i], "-backward") == 0) {
+   		} 
+   		else if (strcmp(methods[i], "-backward") == 0) 
+   		{
    			/*********** BACKWARD ***********/
 
 			int prospectiveBackWardMember = range - 1;
-			for (; prospectiveBackWardMember > largestMustHaveInt; prospectiveBackWardMember--) {
+			for (; prospectiveBackWardMember > largestMustHaveInt; prospectiveBackWardMember--) 
+			{
 					// iterate through the current array to see if any pair (x, y) makes AP with z 
-					if (!anyAPViolation(prospectiveBackWardMember, sizeOfBackwardArray, backwardArray)) {
+					if (!anyAPViolation(prospectiveBackWardMember, sizeOfBackwardArray, backwardArray)) 
+					{
 						backwardArray[sizeOfBackwardArray] = prospectiveBackWardMember;
 						sizeOfBackwardArray += 1;
 					}
@@ -271,10 +374,12 @@ int main(int argc, char *argv[])
 
 			// output array of integers 
 			printf("-backward: %i [", sizeOfBackwardArray);
-			for (int i = 0; i < sizeOfBackwardArray; i ++) {
+			for (int i = 0; i < sizeOfBackwardArray; i ++) 
+			{
 				printf("%i", backwardArray[i]);
 
-				if (i < sizeOfBackwardArray - 1) {
+				if (i < sizeOfBackwardArray - 1) 
+				{
 					printf("%c", ',');
 				} else {
 					printf("]\n");
@@ -283,15 +388,18 @@ int main(int argc, char *argv[])
 			}
 
    		} 
-   		else if (strcmp(methods[i], "-skip") == 0) {
+   		else if (strcmp(methods[i], "-skip") == 0) 
+   		{
    			int loopCounter = 0;
    			for (int prospectiveSkipMember = skipStart; loopCounter < range;
-   			 nextSkipIteration(range, &prospectiveSkipMember, skipJump, &loopCounter)) {
+   			 nextSkipIteration(range, &prospectiveSkipMember, skipJump, &loopCounter)) 
+   			{
 
 					// iterate through the current array to see if any pair (x, y) makes AP with z 
 					if (prospectiveSkipMember > largestMustHaveInt 
 						&& !anyAPViolation(prospectiveSkipMember, sizeOfSkipArray, skipArray) 
-						&& isIntegerInArray(prospectiveSkipMember, skipArray, sizeOfSkipArray) == false) {
+						&& isIntegerInArray(prospectiveSkipMember, skipArray, sizeOfSkipArray) == false) 
+					{
 						skipArray[sizeOfSkipArray] = prospectiveSkipMember;
 						sizeOfSkipArray += 1;
 					}
@@ -303,7 +411,8 @@ int main(int argc, char *argv[])
 
 			// output array of integers 
 			printf("-skip %i %i: %i [", skipStart, skipJump, sizeOfSkipArray);
-			for (int i = 0; i < sizeOfSkipArray; i ++) {
+			for (int i = 0; i < sizeOfSkipArray; i ++) 
+			{
 				printf("%i", skipArray[i]);
 
 				if (i < sizeOfSkipArray - 1) {
@@ -313,7 +422,20 @@ int main(int argc, char *argv[])
 				}
 				
 			}	
-   		} else {
+   		} 
+   		else if (strcmp(methods[i], "-opt") == 0) 
+   		{
+   			int baseNumber = (largestMustHaveInt != 0)? largestMustHaveInt : -1;
+   			// set last choice to 1
+   			int lastChoice = (largestMustHaveInt != 0)? largestMustHaveInt : -1;
+		     /*********** OPT ***********/
+		    // iterate through the set of numbers, starting with the largest must-have int
+		    backtrackNoAP(optArray, partialOptArray,
+				&sizeOfPartial, &sizeOfOptArray, 
+				&lastChoice, baseNumber, range);
+   		}
+   		else 
+   		{
    			printf("NoAP: invalid method; %s is not valid\n", methods[i]);
    		} 
 
