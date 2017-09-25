@@ -4,8 +4,58 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
 
+bool stringToInt(char string[], int *dest) {
+	char *end;
 
+	long lnum = strtol(string, &end, 10);        //10 specifies base-10
+	if (end == string)     //if no characters were converted these pointers are equal
+    {
+    	fprintf(stderr, "ERROR: can't convert string to number\n");
+    	return false;
+    }
+
+	//If sizeof(int) == sizeof(long), we have to explicitly check for overflows
+	if ((lnum == LONG_MAX || lnum == LONG_MIN))
+	{
+	    fprintf(stderr, "ERROR: number out of range for LONG\n");
+	    return false;
+	}
+
+	//Because strtol produces a long, check for overflow
+	if ( (lnum > INT_MAX) || (lnum < INT_MIN) )
+	{
+		fprintf(stderr, "ERROR: number out of range for INT\n");
+		return false;
+
+	}
+
+	//Finally convert the result to a plain int (if that's what you want)
+	*dest = (int) lnum;
+	return true;
+}
+void extractSkipArguments(char argStart[], char argJump[], 
+	int *skipStart, int *skipJump,
+	int start, int range, bool *anySkipViolation) {
+
+	bool isValidStart = stringToInt(argStart, skipStart);
+	bool isValidJump = stringToInt(argJump, skipJump);
+	// in any case there should be no additional output beyond the first error message.
+	if (isValidStart && isValidJump) {
+		if (*skipStart >= range) {
+			*anySkipViolation = true;
+			printf("NoAP: invalid first %i\n", *skipStart);
+		} else if (*skipJump < 1 || *skipJump > range - start) {
+			*anySkipViolation = true;
+			printf("NoAP: invalid step %i\n", *skipJump);
+		}
+	} else {
+		*anySkipViolation = true;
+		printf("NoAP: either first or step are not valid\n");
+	}
+
+}
 bool isIntegerInArray(int val, const int *arr, int size){
     for (int i = 0; i < size; i++) {
 
@@ -16,15 +66,20 @@ bool isIntegerInArray(int val, const int *arr, int size){
     return false;
 }
 
-void nextSkipIteration(int range, int *currentIndex, int skipJump, int *loopCounter) {
+void nextSkipIteration(int range, int *currentIndex, int skipJump, int *loopCounter, int start) {
 	/*TODO BE ABLE TO RECOGNIZE WHEN YOU'RE REPEATING THE LOOP */
 	int flatSum = *currentIndex + skipJump;
-	if (flatSum >= range - 1) {
 
-		*currentIndex = flatSum - (range - 1);
+	if (flatSum >= range) {
+		//*currentIndex = flatSum - (range - 1);
+		*currentIndex = (flatSum % range) + start;
+		//printf("It's a wrap! New index is %i; flatsum is %i of start %i\n", *currentIndex, flatSum, start);
+
 		*loopCounter += 1;
 	} else {
 		*currentIndex = flatSum;
+		//printf("Next index is %i\n", *currentIndex);
+
 
 	}
 }
@@ -68,18 +123,21 @@ void bubbleSort(int arr[], int n)
 /* Function to discover whether integers x,y,z form a AP in a set
 x > y so options for an AP are xyz, zxy, xzy */
 bool isAP(int x, int y, int z) {
-	
+	int modulo1 = abs(x - y);
+	int modulo2 = abs(x - z);
+	int modulo3 = abs(y - z);
+
 	// check for PA xyz
-	if (y - x == z - x) {
+	if (modulo1 == modulo2) {
 
 		return true;
 	} 
 	// check zxy
-	else if (x - z == y - x) {
+	else if (modulo1 == modulo3) {
 		return true;
 	}
 	// check for xzy
-	else if (y - x == z - y) {
+	else if (modulo2 == modulo3) {
 		return true;
 	}
 	// not an AP
@@ -107,7 +165,14 @@ bool anyAPViolation(int prospectiveMember, int sizeOfArray, const int *NoAPArray
 	return false;
 }
 
-
+/***
+* BACKTRACK ALGORITHM: iterates through range, starting from lastChoice + 1 
+* in order to analyze all the different combinations of NoAP
+* Base Case: when the last choice is the base number that started the recursion
+* or an empty array (in case there were no must have ints)
+* Recursion Mechanism: When you finish iterating through all the possibilities
+* for the given starting array, remove your last choice made, and keep iterating
+***/
 void backtrackNoAP(int optArray[], int partialArray[],
 	int *partialSize, int *optSize, 
 	int *lastChoice, int baseNumber, int range) {
@@ -141,7 +206,7 @@ void backtrackNoAP(int optArray[], int partialArray[],
 		else if (prospectiveOpt == range) 
 		{
 			//printf("End of iteration will remove %i since initial choice was %i\n", partialArray[*partialSize - 1], initialChoice);
-
+			//printf("partialSize is %i , optSize is %i\n, lastChoice is %i", *partialSize, *optSize, *lastChoice);
 			// update array
 			if (*partialSize > *optSize) 
 			{
@@ -154,15 +219,21 @@ void backtrackNoAP(int optArray[], int partialArray[],
 				*optSize = *partialSize;
 			}
 
+			/*printf("current partial array of size %i is", *partialSize);
+			for (int i = 0; i < *partialSize; i++) {
+				printf(" %i ", partialArray[i]);
+			}
+			printf("and the sixth element is %i", partialArray[5]);
+			printf("\n"); */
 
 			*lastChoice = partialArray[*partialSize - 1];
+			//printf("last choice is %i\n", *lastChoice);
+
 			// remove last choice
-			//partialArray[*partialSize - 1] = NULL;
 			*partialSize -= 1;
 
 			// exit if it reaches baseNumber or empty array
 			if (*lastChoice == baseNumber || *partialSize == 0) {
-				//printf("Base Case Exit \n");
 				// print
 				printf("-opt: %i [", *optSize);
 
@@ -170,7 +241,7 @@ void backtrackNoAP(int optArray[], int partialArray[],
 					printf("%i", optArray[i]);
 
 					if (i < *optSize - 1) {
-						printf("%c", ',');
+						printf(", ");
 					} else {
 						printf("]\n");
 					}
@@ -178,6 +249,7 @@ void backtrackNoAP(int optArray[], int partialArray[],
 				// copy the content of partial to official array
 				return;
 			}
+			//printf("before recursive call\n");
 			// the first lastChoice is just to keep track of numerical value for next prospective opt
 			backtrackNoAP(optArray, partialArray, 
 				partialSize, optSize, 
@@ -215,7 +287,9 @@ int main(int argc, char *argv[])
 
 	int mustHaveIntegers[argc];
 	int sizeOfMustHaveIntegers = 0;
-	int largestMustHaveInt = 0;
+
+	// initiate as -1 because first prospective member is always largestMusthave +!
+	int largestMustHaveInt = -1;
 	// store the methods
 	char *methods[4];
 	int numberOfMethods = 0;
@@ -225,7 +299,7 @@ int main(int argc, char *argv[])
 
 	// keep track of whether it is a skip argument or a regular must have integer 
 	bool isSkipArgument;
-	int skipStart;
+	int skipStart = 0;
 	int skipJump;
 
 	/**
@@ -274,15 +348,30 @@ int main(int argc, char *argv[])
 	    else if (argcHelper > 1 && argv[argcHelper][0] == '-')
 	    // add method to method array
 	    {	
-	    	   			/*TODO SAFER WAY EXTRACT SKIP ARGUMENTS */
+	    	/*TODO SAFER WAY EXTRACT SKIP ARGUMENTS */
 
 	    	if (strcmp(argv[argcHelper], "-skip") == 0) {
 	    		isSkipArgument = true;
-	    		skipStart = atoi(argv[argcHelper + 1]);
-	    		skipJump = atoi(argv[argcHelper + 2]);
+
+	    		bool anySkipViolation = false;
+
+	    		extractSkipArguments(argv[argcHelper + 1], argv[argcHelper + 2], 
+	    			&skipStart, &skipJump, 
+	    			largestMustHaveInt + 1, range, &anySkipViolation);
+
+	    		if (anySkipViolation) {
+	    			break;
+	    		} else {
+	    			methods[numberOfMethods] = argv[argcHelper];
+	    			numberOfMethods++;
+	    			argcHelper += 2;
+	    		}
+	    		
+	    	} else {
+	    		methods[numberOfMethods] = argv[argcHelper];
+	    		numberOfMethods++;
 	    	}
-	    	methods[numberOfMethods] = argv[argcHelper];
-	    	numberOfMethods++;
+	    	
 	    } 
 
 	    argcHelper++;
@@ -356,6 +445,8 @@ int main(int argc, char *argv[])
 				
 			}
 
+			bubbleSort(array, sizeOfArray);
+
 			// output array of integers 
 			printf("-greedy: %i [", sizeOfArray);
 			for (int i = 0; i < sizeOfArray; i ++) 
@@ -364,7 +455,7 @@ int main(int argc, char *argv[])
 
 				if (i < sizeOfArray - 1) 
 				{
-					printf("%c", ',');
+					printf(", ");
 				} 
 				else
 				{
@@ -373,7 +464,7 @@ int main(int argc, char *argv[])
 				
 			}
    		} 
-   		else if (strcmp(methods[i], "-backwards") == 0) 
+   		else if (strcmp(methods[i], "-backward") == 0) 
    		{
    			/*********** BACKWARD ***********/
 
@@ -393,14 +484,14 @@ int main(int argc, char *argv[])
 
 
 			// output array of integers 
-			printf("-backwards: %i [", sizeOfBackwardArray);
+			printf("-backward: %i [", sizeOfBackwardArray);
 			for (int i = 0; i < sizeOfBackwardArray; i ++) 
 			{
 				printf("%i", backwardArray[i]);
 
 				if (i < sizeOfBackwardArray - 1) 
 				{
-					printf("%c", ',');
+					printf(", ");
 				} else {
 					printf("]\n");
 				}
@@ -411,8 +502,9 @@ int main(int argc, char *argv[])
    		else if (strcmp(methods[i], "-skip") == 0) 
    		{
    			int loopCounter = 0;
+
    			for (int prospectiveSkipMember = skipStart; loopCounter < range;
-   			 nextSkipIteration(range, &prospectiveSkipMember, skipJump, &loopCounter)) 
+   			 nextSkipIteration(range, &prospectiveSkipMember, skipJump, &loopCounter, largestMustHaveInt + 1)) 
    			{
 
 					// iterate through the current array to see if any pair (x, y) makes AP with z 
@@ -436,7 +528,7 @@ int main(int argc, char *argv[])
 				printf("%i", skipArray[i]);
 
 				if (i < sizeOfSkipArray - 1) {
-					printf("%c", ',');
+					printf(", ");
 				} else {
 					printf("]\n");
 				}
