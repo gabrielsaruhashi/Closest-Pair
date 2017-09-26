@@ -91,8 +91,24 @@ bool stringToInt(char string[], int *dest)
 
 	}
 
+	// check for decimal integers
+	int i = 0;
+	char ch;
+	while ((ch = string[i]) != '\0') {
+		if (i == 0 && (ch == '+' || ch == '-')) {
+			// do nothing
+		}
+		else if (!isdigit(ch)) {
+			fprintf(stderr, "ERROR: number is decimal, fractional\n");
+			return false;
+		}
+		printf("%c", ch);
+		i++;
+
+	}
 	//Finally convert the result to a plain int (if that's what you want)
 	*dest = (int) lnum;
+	
 	return true;
 }
 

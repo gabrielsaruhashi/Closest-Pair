@@ -60,15 +60,19 @@ int main(int argc, char *argv[])
 	        
 	    }
 	    // add all must-have integers to the array
-	    else if (argcHelper > 1 && isNumber(argv[argcHelper]) && isMethodArgument == false)
+	    else if (argcHelper > 1  && isMethodArgument == false && argv[argcHelper][0] != '-')
 	    {
-	    	int newMustHaveInt = atoi(argv[argcHelper]);
+	    	//int newMustHaveInt = atoi(argv[argcHelper]);
 
-	    	if (newMustHaveInt > range - 1) 
+	    	int newMustHaveInt;
+
+	    	if (!stringToInt(argv[argcHelper], &newMustHaveInt) && newMustHaveInt > range - 1) 
 	    	{
 	    		fprintf(stderr, "NoAP: integer out of range %i\n", newMustHaveInt);
 	    		return 3;
 	    	}
+
+	    	//printf("argument was %s range is %i and newMustHaveInt is %i\n", argv[argcHelper], range, newMustHaveInt);
 
 	    	// add to must have integers array
 	    	mustHaveIntegers[sizeOfMustHaveIntegers] = newMustHaveInt ;
@@ -242,7 +246,7 @@ int main(int argc, char *argv[])
 
 			printFinalArray(skipArray, sizeOfSkipArray, SKIP, skipStart, skipJump);
    		} 
-   		
+
    		/*********** OPT ***********/
    		else if (strcmp(methods[i], "-opt") == 0) 
    		{
