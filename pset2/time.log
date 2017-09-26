@@ -2,14 +2,16 @@ ESTIMATE of time to complete assignment: 8 hours
 
       Time     Time
 Date  Started  Spent Work completed
-----  -------  ----  --------------
+----  -------  ----  --------------[]
 9/18  5:30pm   4:30  Finished greedy and half of backward
 9/20  4:30pm   3:00  Finished backward and skip, formatted the PSET, and removed repeated code
 9/22  9:30pm   4:00  Finished working implementation for -opt, but it stops working at n > 24
+9/24  1:00pm   2:00  Added the required printf statements for argument errors; create safety checks for the arguments to defend myself against bad inputs
+ 
                 
 
                ----
-               19:00  TOTAL time spent
+               13:30  TOTAL time spent
 
 I discussed my solution with: Sarim Abbas.
 
@@ -18,6 +20,4 @@ Breaking down the problem and thinking about all the edge cases was very challen
 
 
 //TODO
-- for opt, skip to next recursive call if range - prospectiveopt < optSize - partialSize; 
-- check for skip arguments
-- why are sequences starting at 1
+- use my stringToInt() method protect yourself agains huge ints
