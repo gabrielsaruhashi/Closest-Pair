@@ -102,13 +102,12 @@ bool stringToInt(char string[], int *dest)
 			fprintf(stderr, "ERROR: number is decimal, fractional\n");
 			return false;
 		}
-		printf("%c", ch);
 		i++;
 
 	}
 	//Finally convert the result to a plain int (if that's what you want)
 	*dest = (int) lnum;
-	
+
 	return true;
 }
 
@@ -250,39 +249,25 @@ bool anyAPViolation(int prospectiveMember, int sizeOfArray, const int *NoAPArray
 }
 
 
+
+
 void backtrackNoAP(int optArray[], int partialArray[],
 	int *partialSize, int *optSize, 
-	int *lastChoice, int baseNumber, int range) {
+	int *lastChoice, int baseNumber, int range) 
+{
 
 	//printf("New Recursion starting at %i \n", *lastChoice);
 
-	int initialChoice = *lastChoice + 1;
+	int start = *lastChoice + 1;
 
 	// (range - *prospectiveOpt) < *optSize
-	for (int prospectiveOpt = initialChoice; prospectiveOpt <= range; prospectiveOpt++) 
+	for (int prospectiveOpt = start; prospectiveOpt <= range; prospectiveOpt++) 
     {	
-		// end backtracking when 
-		if (baseNumber == prospectiveOpt)
-		{
-			// print
-			printf("-opt: %i [", *optSize);
-
-			for (int i = 0; i < *optSize; i++) {
-				printf("%i", optArray[i]);
-
-				if (i < *optSize - 1) {
-					printf("%c", ',');
-				} else {
-					printf("]\n");
-				}
-			}
-			// copy the content of partial to official array
-			return;
-		}
+		
 		// when finishes going over the entire range
-		else if (prospectiveOpt == range) 
+		if (prospectiveOpt == range) 
 		{
-			//printf("End of iteration will remove %i since initial choice was %i\n", partialArray[*partialSize - 1], initialChoice);
+			//printf("End of iteration will remove %i since initial choice was %i\n", partialArray[*partialSize - 1], start);
 			//printf("partialSize is %i , optSize is %i\n, lastChoice is %i", *partialSize, *optSize, *lastChoice);
 			// update array
 			if (*partialSize > *optSize) 
@@ -295,12 +280,11 @@ void backtrackNoAP(int optArray[], int partialArray[],
 				// update size counter
 				*optSize = *partialSize;
 			}
-
-			/*printf("current partial array of size %i is", *partialSize);
+			/*
+			printf("current partial array of size %i is", *partialSize);
 			for (int i = 0; i < *partialSize; i++) {
 				printf(" %i ", partialArray[i]);
 			}
-			printf("and the sixth element is %i", partialArray[5]);
 			printf("\n"); */
 
 			*lastChoice = partialArray[*partialSize - 1];
@@ -311,28 +295,31 @@ void backtrackNoAP(int optArray[], int partialArray[],
 
 			// exit if it reaches baseNumber or empty array
 			if (*lastChoice == baseNumber || *partialSize == 0) {
-				// print
-				printf("-opt: %i [", *optSize);
-
-				for (int i = 0; i < *optSize; i++) {
-					printf("%i", optArray[i]);
-
-					if (i < *optSize - 1) {
-						printf(", ");
-					} else {
-						printf("]\n");
-					}
-				}
-				// copy the content of partial to official array
 				return;
 			}
-			//printf("before recursive call\n");
+
 			// the first lastChoice is just to keep track of numerical value for next prospective opt
 			backtrackNoAP(optArray, partialArray, 
 				partialSize, optSize, 
 				lastChoice, baseNumber, range);
 		}
-		
+		else if (range - prospectiveOpt < *optSize - *partialSize) {
+
+			*lastChoice = partialArray[*partialSize - 1];
+			printf("HEURISTICS: useless choice is %i last choice is %i\n", partialArray[*partialSize - 1], *lastChoice);
+
+			// remove last choice
+			*partialSize -= 1;
+
+
+			if (*lastChoice == baseNumber || *partialSize == 0) {
+				return;
+			}
+
+			backtrackNoAP(optArray, partialArray, 
+				partialSize, optSize,
+				lastChoice, baseNumber, range);
+		}
 		else 
 		{
 			if (!anyAPViolation(prospectiveOpt, *partialSize, partialArray)) 
@@ -340,7 +327,8 @@ void backtrackNoAP(int optArray[], int partialArray[],
 				*lastChoice = prospectiveOpt;
 				partialArray[*partialSize] = prospectiveOpt;
 				*partialSize += 1;
-				/*printf("ADDED %i, current partial array of size %i is", prospectiveOpt, *partialSize);
+				/*
+				printf("ADDED %i, current partial array of size %i is", prospectiveOpt, *partialSize);
 				for (int i = 0; i < *partialSize; i++) {
 					printf(" %i ", partialArray[i]);
 				}

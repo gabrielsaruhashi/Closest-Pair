@@ -72,7 +72,6 @@ int main(int argc, char *argv[])
 	    		return 3;
 	    	}
 
-	    	//printf("argument was %s range is %i and newMustHaveInt is %i\n", argv[argcHelper], range, newMustHaveInt);
 
 	    	// add to must have integers array
 	    	mustHaveIntegers[sizeOfMustHaveIntegers] = newMustHaveInt ;
@@ -250,14 +249,16 @@ int main(int argc, char *argv[])
    		/*********** OPT ***********/
    		else if (strcmp(methods[i], "-opt") == 0) 
    		{
-   			int baseNumber = largestMustHaveInt;
    			// set last choice to 1
+   			int baseNumber = largestMustHaveInt;
    			int lastChoice = largestMustHaveInt;
 		    
 		    // iterate through the set of numbers, starting with the largest must-have int
 		    backtrackNoAP(optArray, partialOptArray,
 				&sizeOfPartial, &sizeOfOptArray, 
 				&lastChoice, baseNumber, range);
+
+		    printFinalArray(optArray, sizeOfOptArray, OPT, 0, 0);
    		}
    		else 
    		// if somehow user sneaks in an invalid method, just let him know it is not a valid method
