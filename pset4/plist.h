@@ -3,15 +3,17 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
+
+#include "point.h"
+
+#define PLIST_INITIAL_SIZE 2
 
 struct point;
 struct plist;
 
 // check this
-typedef struct plist {
-	int size = 0;
-	point *pointsArray[];
-} plist;
+typedef struct plist plist;
 
 /**
  * Creates an empty list of points.

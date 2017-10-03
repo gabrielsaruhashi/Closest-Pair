@@ -20,6 +20,9 @@
  * @return a negative number if p1 comes before p2, positive if p1 comes
  * before p2, and 0 if they are the same
  */
+
+
+// CHECARRRRR DEPOIS const void *p1, e depois tem que castear
 int point_compare_x(const point *p1, const point *p2);
 
 /**
@@ -28,7 +31,7 @@ int point_compare_x(const point *p1, const point *p2);
  * @param p1 a pointer to a point, non-NULL
  * @param p2 a pointer to a point, non-NULL
  * @return a negative number if p1 comes before p2, positive if p1 comes
- * before p2, and 0 if they are the same
+ * after p2, and 0 if they are the same
  */
 int point_compare_y(const point *p1, const point *p2);
 
@@ -230,13 +233,16 @@ void closest_pair(const plist *list_x, const plist *list_y, point *p1, point *p2
   // clean up
 }
 
+
+
+
 // @return a negative number if p1 comes before p2, positive if p1 comes
 // * before p2, and 0 if they are the same
 int point_compare_x(const point *p1, const point *p2) {
-  if (*p1->x > *p2->x) {
+  if (p1->x > p2->x) {
     return -1;
   } 
-  else if (*p1->x < *p2->x) {
+  else if (p1->x < p2->x) {
     return 1;
   } 
   // if they are the same, return 0
@@ -248,11 +254,11 @@ int point_compare_x(const point *p1, const point *p2) {
 // before p2, and 0 if they are the same
 int point_compare_y(const point *p1, const point *p2) {
   // p1 comes BEFORE p2
-  if (*p1->y < *p2->y) {
+  if (p1->y < p2->y) {
     return -1;
   }
   // p1 come AFTER p2
-  else if (*p1->y > *p2->y) {
+  else if (p1->y > p2->y) {
     return 1;
   }
   else {
@@ -263,11 +269,11 @@ int point_compare_y(const point *p1, const point *p2) {
 void read_points(FILE *stream, plist *l, int n) {
   FILE *fp;
   point newPoint;
-  int x;
-  int y;
+  float x;
+  float y;
   int iterator;
 
-  fp = fopen(*stream, "r");
+  fp = fopen(stream, "r");
 
   if (f == 0) {
     /* perror is a standard C library routine */
@@ -288,7 +294,7 @@ void read_points(FILE *stream, plist *l, int n) {
       }
     }
     // get the digit
-    x = iterator;
+    x = atof(iterator);
 
     while (!isdigit(iterator = getc(fp))) {
       if (iterator == EOF || iterator == '\n') {
@@ -297,14 +303,14 @@ void read_points(FILE *stream, plist *l, int n) {
       }
     }
     // get the y point
-    y = iterator;
+    y = atof(iterator);
 
     // populate new point
     newPoint->x = x;
     newPoint->y = y;
 
     // add point to array
-    *l[i] = newPoint;
+    l[i] = newPoint;
   }
 
 
@@ -316,10 +322,14 @@ void read_points(FILE *stream, plist *l, int n) {
 // CHECK
 void copy_list(plist *dest, const plist* source) {
 
-  for (int i = 0; i < source->size; i++) {
-    *dest->pointsArray[i] = source->pointsArray[i];
+  for (int i = 0; i < source->size; i++) 
+  {
+    // add to end of list
+    plist_add_end(dest, source->pointsArray[i]);
   }
-  *dest.size = source->size;
+  
+  dest->size = source->size;
+  dest->capacity = source->capacity;
 }
 
 void closest_pair_brute_force(const plist *l, point *p1, point *p2, double *d) {
@@ -327,38 +337,88 @@ void closest_pair_brute_force(const plist *l, point *p1, point *p2, double *d) {
 
   do
   {
-    double distance = point_distance(*l->pointsArray[i], *l->pointsArray[i + 1]);
+    double distance = point_distance(l->pointsArray[i], l->pointsArray[i + 1]);
 
     if (i = 0 || distance < *d) 
     {
-      *p1 = *l[i];
-      *p2 = *l[i + 1];
-      *d =  distance;
+      p1 = l[i];
+      p2 = l[i + 1];
+      d =  distance;
     }
     
     i++;
 
-  } while (i < *l->size);
+  } while (i < l->size - 1);
 
 }
 
 void split_list_x(const plist *l, plist *left, plist *right) {
-  int middle = *l->size / 2;
+  int middle = l->size / 2;
 
-  for (int i = 0; i < *l->size, i++) {
+  for (int i = 0; i < l->size, i++) {
     if (i < middle) {
-      *left.pointsArray[i] = *l->pointsArray[i];
-      *left.size++;
+
+      plist_add_end(left, l->pointsArray[i]);
+    
 
     } 
     else 
     {
-      *right.pointsArray[i] = *l->pointsArray[i];
-      *right.size++;
+      plist_add_end(right, l->pointsArray[i]);
+
     }
 
   }
 }
+
+void split_list_y(const plist *l, const plist *x_left, const plist *x_right,
+      plist *y_left, plist *y_right) {
+
+  // get last element of x-left
+  point dividingPoint;
+  plist_get(x_left, plist_size(x_left), &dividingPoint);
+
+  // get middle x value
+  int middle_x = dividingPoint->x;
+
+
+  for (int i = 0; i < plist_size(l), i++) {
+    if (i < middle) {
+      y_left.pointsArray[i] = l->pointsArray[i];
+      y_left.size++;
+
+    } 
+    else 
+    {
+      y_right->pointsArray[i] = l->pointsArray[i];
+      y_right->size++;
+    }
+
+  }
+  
+}
+
+
+void make_middle(const plist *list_y, plist *middle, double left, double right) {
+  for (int i = 0; i < list_y->size; i++) {
+    point pointElement = list_y->pointsArray[i];
+    // add every point that is within the range
+    if (pointElement->x >= left && pointElement->x <= right) {
+      // adds to end and updates size
+      plist_add_end(middle, pointElement);
+
+    }
+  }
+}
+
+void search_middle(const plist *middle, point *p1, point *p2, double *d) {
+    // if more than one point, compare it to d
+    if (middle->size > 1) {
+      closest_pair_brute_force(middle, p1, p2, d);
+    }
+}
+
+
 
 
 
