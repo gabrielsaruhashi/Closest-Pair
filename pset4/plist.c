@@ -49,6 +49,7 @@ bool plist_add_end(plist *l, const point *p) {
      point *largerPointsArray = realloc(l->pointsArray, sizeof(point) * largerCap);
 
     if (largerPointsArray != NULL ){
+        // update array and capacity
         l->pointsArray = largerPointsArray;
         l->capacity = largerCap;
     } 
@@ -59,10 +60,14 @@ bool plist_add_end(plist *l, const point *p) {
   
   }
   // just add
-   if (plist_size(l) < l->capacity)
+  if (plist_size(l) < l->capacity)
   {
     l->pointsArray[plist_size(l)] = *p;
     l->size++;
+    //printf("it's here with size %i\n", plist_size(l));
+
+    //point_fprintf(stdout, "%.3f\n", &l->pointsArray[plist_size(l) - 1]);
+
   }
 
   return true;
@@ -70,6 +75,7 @@ bool plist_add_end(plist *l, const point *p) {
 }
 
 void plist_get(const plist *l, int i, point *p) {
+
   *p = l->pointsArray[i];
 
 }
@@ -93,6 +99,23 @@ bool plist_contains(const plist *l, const point *p)
 
 }
 
+void plist_fprintf(FILE *stream, const char *fmt, const plist *l) {
+    
+    fprintf(stream, "%c ", '[');
+    printf("%i\n", plist_size(l));
+    for (int i = 0; i < plist_size(l); i++) 
+    {
+      point currentPoint;
+      plist_get(l, i, &currentPoint);
+
+      point_fprintf(stream, fmt, &currentPoint);
+    }
+
+    fprintf(stream, "%c\n ", ']');
+
+
+    
+}
 
 void plist_sort(plist *l, int (*compare)(const point* point1, const point* point2)) {
  // cast it

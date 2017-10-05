@@ -233,9 +233,6 @@ void closest_pair(const plist *list_x, const plist *list_y, point *p1, point *p2
   // clean up
 }
 
-
-
-
 // @return a negative number if p1 comes before p2, positive if p1 comes
 // * before p2, and 0 if they are the same
 int point_compare_x(const point *p1, const point *p2) {
@@ -249,6 +246,7 @@ int point_compare_x(const point *p1, const point *p2) {
   else {
     return 0;
   }
+}
 
 // @return a negative number if p1 comes before p2, positive if p1 comes
 // before p2, and 0 if they are the same
@@ -275,7 +273,7 @@ void read_points(FILE *stream, plist *l, int n) {
 
   fp = fopen(stream, "r");
 
-  if (f == 0) {
+  if (fp == 0) {
     /* perror is a standard C library routine */
     /* that prints a message about the last failed library routine */
     /* prepended by its argument */
@@ -293,8 +291,20 @@ void read_points(FILE *stream, plist *l, int n) {
         break;
       }
     }
-    // get the digit
-    x = atof(iterator);
+    // unget first digit
+    ungetc(iterator);
+
+    // allocate the digits to the array
+    char *floatX = malloc(sizeof(char) * 9);
+    floatX[0] = '\0'
+
+    while(isdigit(iterator = getc(fp))) {
+      floatX[strlen(floatX)] = iterator;
+      floatx[strlen(floatx)] = '\0';
+    }
+
+    ungetc(iterator);
+    x = atof(floatX);
 
     while (!isdigit(iterator = getc(fp))) {
       if (iterator == EOF || iterator == '\n') {
@@ -302,15 +312,29 @@ void read_points(FILE *stream, plist *l, int n) {
         break;
       }
     }
+
+    ungetc(iterator);
+
+    // allocate the digits to the array
+    char *floatY = malloc(sizeof(char) * 9);
+    floatY[0] = '\0'
+
+    while(isdigit(iterator = getc(fp))) {
+      floatY[strlen(floatX)] = iterator;
+      floatY[strlen(floatx)] = '\0';
+    }
+
+    ungetc(iterator);
+
     // get the y point
-    y = atof(iterator);
+    y = atof(floaY);
 
     // populate new point
     newPoint->x = x;
     newPoint->y = y;
 
     // add point to array
-    l[i] = newPoint;
+    plist_add_end(l ,newPoint);
   }
 
 
@@ -375,26 +399,32 @@ void split_list_y(const plist *l, const plist *x_left, const plist *x_right,
       plist *y_left, plist *y_right) {
 
   // get last element of x-left
-  point dividingPoint;
+  point *dividingPoint;
   plist_get(x_left, plist_size(x_left), &dividingPoint);
 
   // get middle x value
   int middle_x = dividingPoint->x;
 
 
-  for (int i = 0; i < plist_size(l), i++) {
-    if (i < middle) {
-      y_left.pointsArray[i] = l->pointsArray[i];
-      y_left.size++;
-
+  for (int i = 0; i < plist_size(l), i++) 
+  {
+    point *newPoint;
+    if (i <= middle_x) 
+    {
+      plist_get(y_left, i, &newPoint)
+      plist_add_end(y_left, &newPoint);
     } 
     else 
     {
-      y_right->pointsArray[i] = l->pointsArray[i];
-      y_right->size++;
+      plist_get(y_left, i, &newPoint)
+      plist_add_end(y_left, &newPoint);
     }
 
   }
+
+  // sort both y_left and y_right
+  plist_sort(y_left, point_compare_y);
+  plist_sort(y_left, point_compare_x);
   
 }
 
@@ -417,8 +447,5 @@ void search_middle(const plist *middle, point *p1, point *p2, double *d) {
       closest_pair_brute_force(middle, p1, p2, d);
     }
 }
-
-
-
 
 
