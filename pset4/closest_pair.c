@@ -172,10 +172,16 @@ int main(int argc, char **argv)
   // read into one list
   read_points(stdin, list_x, n);
 
+  // TODO scheck if all points were valid
+  if (plist_size(list_x) < n) {
+    fprintf(stderr, "At main: Error reading inputs\n");
+    return 3;
+  }
+
   // sort list
   plist_sort(list_x, point_compare_x);
 
-  // check for distinctness, ensure
+  // check for distinctness, ensure no repeated points
   
   // make list_y a copy of list_x
   copy_list(list_y, list_x);
@@ -282,10 +288,9 @@ int point_compare_y(const point *p1, const point *p2) {
 
 void read_points(FILE *stream, plist *l, int n) {
   //FILE *fp;
-  point newPoint;
   float x;
   float y;
-  int iterator;
+  char iterator;
 
   /*
   fp = fopen(stream, "r");
@@ -298,23 +303,37 @@ void read_points(FILE *stream, plist *l, int n) {
 
   /* else everything is ok, so add points */
   for (int i = 0; i < n; i++) {
-    // get  x
-    // skips whitespace and 
+    point newPoint;
+
+    printf("Iteration %i out of %i\n", i, n);
+
+    // ignore the first newline, unless EOF. In that case, return
+    if ((iterator = getc(stream)) == EOF) {
+      return;
+    }
+
+    // skips whitespace before x 
     while (!isdigit(iterator = getc(stream))) {
-      if (iterator == EOF || iterator == '\n') {
-        fprintf(stderr, "Error reading input line");
-        break;
+     //if (iterator == EOF || iterator == '\n' || isalpha(iterator)) 
+      // only skip valid whitespaces, otherwise break functions
+      if (iterator != ' ' && iterator != '\t') {
+        //fprintf(stderr, "Error reading input line at char %c", iterator);
+        return;
       }
     }
+  
+
     // unget first digit
     ungetc(iterator, stream);
 
     // allocate the digits to the array
-    char *floatX = malloc(sizeof(char) * 9);
-    floatX[0] = '\0';
+    // TODO decide on number to malloc
+    char *floatX = malloc(sizeof(char) * 50);
+  
 
     // add characters to floatx string, ex: 4.500
     while(isdigit(iterator = getc(stream))) {
+      //printf("current char is %c\n",iterator);
       floatX[strlen(floatX)] = iterator;
       floatX[strlen(floatX)] = '\0';
     }
@@ -324,11 +343,13 @@ void read_points(FILE *stream, plist *l, int n) {
     // convert string into a float
     x = atof(floatX);
 
+    printf("x-coordinate is %f\n",x);
+
     // remove trailing whitespace
     while (!isdigit(iterator = getc(stream))) {
-      if (iterator == EOF || iterator == '\n') {
-        fprintf(stderr, "Error with the input line");
-        break;
+      if (iterator != ' ' && iterator != '\t') {
+        //fprintf(stderr,"Error reading input line at char %c", iterator);
+        return;
       }
     }
 
@@ -336,19 +357,22 @@ void read_points(FILE *stream, plist *l, int n) {
     ungetc(iterator, stream);
 
     // allocate the digits to the array
-    char *floatY = malloc(sizeof(char) * 9);
+    char *floatY = malloc(sizeof(char) * 50);
     floatY[0] = '\0';
 
     while(isdigit(iterator = getc(stream))) {
-      floatY[strlen(floatX)] = iterator;
-      floatY[strlen(floatX)] = '\0';
+      //printf("current char for y is %c\n",iterator);
+      floatY[strlen(floatY)] = iterator;
+      floatY[strlen(floatY)] = '\0';
     }
 
-    // unget last element that is not array
+    // unget last element that is not part of float y
     ungetc(iterator, stream);
 
     // get the y point
     y = atof(floatY);
+
+    printf("y-coordinate is %f\n", y);
 
     // populate new point
     newPoint.x = x;
@@ -357,10 +381,29 @@ void read_points(FILE *stream, plist *l, int n) {
     // add point to array
     plist_add_end(l ,&newPoint);
 
-    while ((iterator = getc(stream)) != '\n' || iterator != EOF) {
+
+    // skip all trailing whitespace until newline or EOF
+    while ((iterator = getc(stream)) != '\n' && iterator != EOF) {
+     printf("here with char %c\n", iterator);
+
       // ignore trailing whitespace until you can move to new line
+      if (iterator != ' ' && iterator != '\t') {
+        fprintf(stderr, "Error reading input line at char %c", iterator);
+        return;
+      }
     }
 
+    // if last iteration
+    if (i == n - 1) {
+      printf("returning");
+      return;
+    }
+    // unget newline or EOF for next iteration
+    else 
+    {
+      printf("i is %i\n", i);
+      ungetc(iterator, stream);
+    }
   }
 
 }
@@ -419,6 +462,7 @@ void closest_pair_brute_force(const plist *l, point *p1, point *p2, double *d) {
 }
 
 void split_list_x(const plist *l, plist *left, plist *right) {
+  // TODO what if last left and first right are the same x
   int middle = plist_size(l) / 2;
 
   for (int i = 0; i < plist_size(l); i++) {
@@ -444,11 +488,13 @@ void split_list_y(const plist *l, const plist *x_left, const plist *x_right,
 {
 
   // get last element of x-left
-  point *dividingPoint = NULL;
-  plist_get(x_left, plist_size(x_left) - 1, dividingPoint);
+  point *last_x_left = NULL;
+  point *first_x_right = NULL;
+  plist_get(x_left, plist_size(x_left) - 1, last_x_left);
+  plist_get(x_right, 0, first_x_right);
 
   // get middle x value
-  int middle = dividingPoint->x;
+  float middle = (last_x_left->x + first_x_right->x) / 2;
   int size = plist_size(l);
 
   for (int i = 0; i < size; i++) 
@@ -463,12 +509,13 @@ void split_list_y(const plist *l, const plist *x_left, const plist *x_right,
     } 
     else 
     {
-      plist_add_end(y_left, nextPoint);
+      plist_add_end(y_right, nextPoint);
     }
 
   }
 
-  free(dividingPoint);
+  free(last_x_left);
+  free(first_x_right);
   
 }
 

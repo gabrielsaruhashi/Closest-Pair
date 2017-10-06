@@ -62,7 +62,10 @@ bool plist_add_end(plist *l, const point *p) {
   // just add
   if (plist_size(l) < l->capacity)
   {
+    printf("here2 with size %i and capacity %i\n", l->size, l->capacity);
+
     l->pointsArray[plist_size(l)] = *p;
+    printf("im here");
     l->size++;
     //printf("it's here with size %i\n", plist_size(l));
 
