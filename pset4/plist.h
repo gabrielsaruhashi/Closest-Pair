@@ -4,13 +4,15 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
+
 
 #include "point.h"
 
 #define PLIST_INITIAL_SIZE 2
 
 struct point;
-struct plist;
+//struct plist;
 
 // check this
 typedef struct plist plist;
@@ -92,5 +94,13 @@ void plist_fprintf(FILE *stream, const char *fmt, const plist *l);
  * first, and zero if the have the same ordinal value.
  */
 void plist_sort(plist *l, int (*compare)(const point*, const point*));
+
+void plist_set_size(plist *l, int size_);
+
+int plist_capacity(const plist *l);
+
+void plist_set_capacity(plist *l, int capacity_);
+
+
 
 #endif

@@ -26,14 +26,18 @@ int main(int argc, char **argv)
   plist_add_end(pts, &p1);
   plist_add_end(pts, &p2);
 
-  bool in_list = plist_contains(pts, &p3);
+  bool in_list = plist_contains(pts, &p1);
+
   use_bool(in_list);
 
   plist_get(pts, 1, &p3);
 
   plist_sort(pts, compare_x);
 
+  printf("before");
   plist_fprintf(stdout, "%.3f\n", pts);
+    printf("after");
+
 
   plist_destroy(pts);
 }

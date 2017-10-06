@@ -101,14 +101,30 @@ bool plist_contains(const plist *l, const point *p)
 
 void plist_fprintf(FILE *stream, const char *fmt, const plist *l) {
     
+    // official formatter
+    char *formatter = malloc(sizeof(char) * strlen(fmt));
+
+    // strip the \n from the formatter, if any
+    for (int i = 0; i < strlen(fmt); i++) {
+      if (fmt[i] == '\n') 
+      {
+         strncpy(formatter, fmt, strlen(fmt) - 1);
+
+      }
+    }
+    
+    int size = plist_size(l);
     fprintf(stream, "%c ", '[');
-    printf("%i\n", plist_size(l));
-    for (int i = 0; i < plist_size(l); i++) 
+    for (int i = 0; i < size; i++) 
     {
       point currentPoint;
       plist_get(l, i, &currentPoint);
 
-      point_fprintf(stream, fmt, &currentPoint);
+      point_fprintf(stream, formatter, &currentPoint);
+
+      if (i != size - 1) {
+        fprintf(stream, "%c ", ',');
+      }
     }
 
     fprintf(stream, "%c\n ", ']');
@@ -120,6 +136,18 @@ void plist_fprintf(FILE *stream, const char *fmt, const plist *l) {
 void plist_sort(plist *l, int (*compare)(const point* point1, const point* point2)) {
  // cast it
  qsort(l->pointsArray, l->size, sizeof(point), (int (*) (const void *, const void *)) compare);
+}
+
+void plist_set_size(plist *l, int size_) {
+  l->size = size_;
+}
+
+int plist_capacity(const plist *l) {
+  return l->capacity;
+}
+
+void plist_set_capacity(plist *l, int capacity_) {
+  l->capacity = capacity_;
 }
 
 
