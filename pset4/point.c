@@ -4,6 +4,8 @@
 #include <string.h>
 
 #include "point.h"
+#define PLIST_INITIAL_SIZE 2
+
 
 void point_fprintf(FILE *stream, const char *fmt, const point *p)
 {

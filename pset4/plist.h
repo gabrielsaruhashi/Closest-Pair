@@ -9,7 +9,6 @@
 
 #include "point.h"
 
-#define PLIST_INITIAL_SIZE 2
 
 struct point;
 //struct plist;

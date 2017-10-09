@@ -140,6 +140,9 @@ bool is_feasible_point(int initial_y, int next_y, const double *d);
 void updateSmallestDistance(double *d, point *p1, point *p2, 
       double smallerDistance, point *new_p1, point *new_p2);
 
+bool read_single_float(char *float_string, float *floaty, int *size, 
+  bool *isNegative, bool *hasDecimalCase, FILE *stream);
+
 int main(int argc, char **argv)
 {
   // program does not need any arguments
@@ -175,38 +178,28 @@ int main(int argc, char **argv)
   read_points(stdin, list_x, n);
   // TODO scheck if all points were valid
   if (plist_size(list_x) < n) {
-    fprintf(stderr, "At main: Error reading inputs\n");
+    fprintf(stderr, "At main: Error reading inputs. Expected size %i, but there were %i valid elements\n", n, plist_size(list_x));
     return 3;
   }
 
 
   // sort list
   plist_sort(list_x, point_compare_x);
-  /*
-  printf("Sorted: ");
-  plist_fprintf(stdout, "%.3f\n", list_x);
-  */
+ 
 
   // check for distinctness, ensure no repeated points
-  
+
+
   // make list_y a copy of list_x
   copy_list(list_y, list_x);
 
-  /*
-  printf("Copied list_y: ");
-  plist_fprintf(stdout, "%.3f\n", list_y);
-  */
-
-
   
+
   if (plist_size(list_y) == n)
     {
       // sort the y-list
       plist_sort(list_y, point_compare_y);
-      /*
-      printf("Sorted list_y: ");
-      plist_fprintf(stdout, "%.3f\n", list_y);
-      */
+
       
       point p1, p2;
       double d;
@@ -241,18 +234,18 @@ void closest_pair(const plist *list_x, const plist *list_y, point *p1, point *p2
   // populate left/right lists
   split_list_x(list_x, x_left, x_right);
 
-  //TODO erase
+  /*TODO erase
   printf("x_left: ");
   plist_fprintf(stdout, "%.3f\n", x_left);
   printf("x_right: ");
-  plist_fprintf(stdout, "%.3f\n", x_right);
+  plist_fprintf(stdout, "%.3f\n", x_right); */
 
   split_list_y(list_y, x_left, x_right, y_left, y_right);
 
-  printf("y_left: ");
+  /*printf("y_left: ");
   plist_fprintf(stdout, "%.3f\n", y_left);
   printf("y_right: ");
-  plist_fprintf(stdout, "%.3f\n", y_right);
+  plist_fprintf(stdout, "%.3f\n", y_right); */
   
   // recursively find closest pair in two halves and keep the closer of those
   point p1_left, p2_left;
@@ -264,21 +257,20 @@ void closest_pair(const plist *list_x, const plist *list_y, point *p1, point *p2
   closest_pair(x_right, y_right, &p1_right, &p2_right, &d_right);
 
   // determine which pair is closer together
-  printf("d_left is %f while d_right is %f\n", d_left, d_right);
   *d = (d_right > d_left) ? d_right : d_left;
 
-  // TODO delete
+  /*TODO delete
   printf("final left points are: ");
   point_fprintf(stdout, "%.3f\n", &p1_left);
 
   point_fprintf(stdout, "%.3f\n", &p2_left);
   printf("final right points are");
   point_fprintf(stdout, "%.3f\n", &p1_right);
-   point_fprintf(stdout, "%.3f\n", &p2_right);
+   point_fprintf(stdout, "%.3f\n", &p2_right); */
 
   // mid is the average of x-coordinate of last element of x_left and first element of x_right
   double mid = ((p1_right.x - p2_left.x) / 2.0) + p2_left.x;
-  printf("dividing mid line is %f\n", mid);
+  //printf("dividing mid line is %f\n", mid);
 
   // create the list of points in the middle
   plist *middle = plist_create();
@@ -286,9 +278,9 @@ void closest_pair(const plist *list_x, const plist *list_y, point *p1, point *p2
   // populate that list
   make_middle(list_y, middle, mid - *d, mid + *d);
 
-  //TODO delete
+  /*TODO delete
   printf("Middle strip points are");
-  plist_fprintf(stdout, "%.3f\n", middle);
+  plist_fprintf(stdout, "%.3f\n", middle); */
 
   // search the list of points in middle for a closer pair
   search_middle(middle, p1, p2, d);
@@ -329,91 +321,172 @@ int point_compare_y(const point *p1, const point *p2) {
 
 void read_points(FILE *stream, plist *l, int n) {
   //FILE *fp;
-  float x;
-  float y;
-  char iterator;
 
-  /*
-  fp = fopen(stream, "r");
 
-  if (fp == 0) {
-    
-    perror("Error opening file");
-    exit(2);
-  } */
+
 
   /* else everything is ok, so add points */
   for (int i = 0; i < n; i++) {
+    float x = 0.0;
+    float y = 0.0;
+    bool isNegative_x;
+    bool isNegative_y;
+    bool hasDecimalCase_x;
+    bool hasDecimalCase_y;
     point newPoint;
+    char *float_string_x = malloc(sizeof(char) * 50);
+    int size_x = 0;
+    char *float_string_y = malloc(sizeof(char) * 50);
+    int size_y = 0;
+    //char *float_string_y = 
 
-    printf("Iteration %i out of %i\n", i, n);
+    read_single_float(float_string_x, &x, &size_x, &isNegative_x, &hasDecimalCase_x, stream);
+    read_single_float(float_string_y, &y, &size_y, &isNegative_y, &hasDecimalCase_y, stream);
 
+    
+    /*
     // ignore the first newline, unless EOF. In that case, return
     if ((iterator = getc(stream)) == EOF) {
       return;
     }
 
+
     // skips whitespace before x 
     while (!isdigit(iterator = getc(stream))) {
-     //if (iterator == EOF || iterator == '\n' || isalpha(iterator)) 
+    
       // only skip valid whitespaces, otherwise break functions
       if (iterator != ' ' && iterator != '\t') {
-        //fprintf(stderr, "Error reading input line at char %c", iterator);
-        return;
+
+        // check for valid negative sign
+        if (iterator == '-') {
+          supportIterator = getc(stream);
+
+          if (isdigit(supportIterator)) {
+            ungetc(supportIterator, stream);
+            isNegativeX = true;
+            break;
+          }
+        } 
+        else 
+        {
+          //fprintf(stderr, "Error reading input line at char %c", iterator);
+          return;
+        }    
+        
       }
     }
   
-
-    // unget first digit
-    ungetc(iterator, stream);
 
     // allocate the digits to the array
     // TODO decide on number to malloc
     char *floatX = malloc(sizeof(char) * 50);
+    int size_x = 0;
+
+    if (isNegativeX) {
+      floatX[size_x] = '-';
+      size_x++;
+      floatX[size_x] = '\0';
+    
+    }
+    else 
+    {
+      // unget first digit
+      ungetc(iterator, stream);
+      floatX[size_x] = '\0';
+
+    }
   
 
     // add characters to floatx string, ex: 4.500
-    while(isdigit(iterator = getc(stream))) {
+    while(isdigit(iterator = getc(stream)) ||
+     (iterator == '.' && !hasDecimalDotX)) {
       //printf("current char is %c\n",iterator);
-      floatX[strlen(floatX)] = iterator;
-      floatX[strlen(floatX)] = '\0';
+      floatX[size_x] = iterator;
+      size_x++;
+      floatX[size_x] = '\0';
+
+      if (iterator == '.') {
+        hasDecimalDotX = true;
+      }
+      printf("BOOGA current char is %c\n", iterator);
     }
 
     // unget last char that is not a digit of float x
+    printf("lastchar is %c\n", iterator);
     ungetc(iterator, stream);
     // convert string into a float
     x = atof(floatX);
+    */
+    
 
-    printf("x-coordinate is %f\n",x);
 
+    /*  Now for the Y-coordinate */
     // remove trailing whitespace
+
+
+    /*
     while (!isdigit(iterator = getc(stream))) {
+      // only skip valid whitespaces, otherwise break functions
+      printf("considering char for Y %c\n", iterator);
       if (iterator != ' ' && iterator != '\t') {
-        //fprintf(stderr,"Error reading input line at char %c", iterator);
-        return;
+        printf("current char Y is %c\n", iterator);
+        // check for valid negative sign
+        if (iterator == '-') {
+          supportIterator = getc(stream);
+          printf("found negative sign at y. Following char is %c\n", supportIterator);
+
+
+          if (isdigit(supportIterator)) {
+            ungetc(supportIterator, stream);
+            isNegativeY = true;
+            break;
+          }
+          else {
+            return;
+          }
+        } 
+        else 
+        {
+          fprintf(stderr, "Error removing triling space for Y at char %c\n", iterator);
+          return;
+        }    
+        
       }
     }
 
-    // unget last char that is int
-    ungetc(iterator, stream);
 
     // allocate the digits to the array
-    char *floatY = malloc(sizeof(char) * 50);
-    floatY[0] = '\0';
+    char *float_string = malloc(sizeof(char) * 50);
+    float_string[0] = '\0';
 
-    while(isdigit(iterator = getc(stream))) {
+
+    if (isNegativeY) 
+    {
+      float_string[0] = '-';
+      float_string[1] = '\0';
+    }
+    else {
+      ungetc(iterator, stream);
+    }
+
+    while(isdigit(iterator = getc(stream)) ||
+     (iterator == '.' && !hasDecimalDotY )) {
       //printf("current char for y is %c\n",iterator);
-      floatY[strlen(floatY)] = iterator;
-      floatY[strlen(floatY)] = '\0';
+      if (iterator == '.') {
+        hasDecimalDotY = true;
+      }
+      float_string[strlen(float_string)] = iterator;
+      float_string[strlen(float_string)] = '\0';
     }
 
     // unget last element that is not part of float y
     ungetc(iterator, stream);
 
     // get the y point
-    y = atof(floatY);
+    y = atof(float_string);
 
-    printf("y-coordinate is %f\n", y);
+    printf("float Y is %f\n", y);
+  */
 
     // populate new point
     newPoint.x = x;
@@ -422,6 +495,7 @@ void read_points(FILE *stream, plist *l, int n) {
     // add point to array
     plist_add_end(l ,&newPoint);
 
+    char iterator;
 
     // skip all trailing whitespace until newline or EOF
     while ((iterator = getc(stream)) != '\n' && iterator != EOF) {
@@ -433,9 +507,10 @@ void read_points(FILE *stream, plist *l, int n) {
       }
     }
 
+    free(float_string_x);
+    free(float_string_y);
     // if last iteration
     if (i == n - 1) {
-      printf("last iteration at %i\n", i);
       return;
     }
     // unget newline or EOF for next iteration
@@ -491,9 +566,7 @@ void closest_pair_brute_force(const plist *l, point *p1, point *p2, double *d) {
         *d = distance_temp;
         *p1 = p1_temp;
         *p2 = p2_temp;
-        printf("News smallest Distance is %f with points\n", *d);
-        point_fprintf(stdout, "%.3f\n", p1);
-        point_fprintf(stdout, "%.3f\n", p2);
+      
 
       }
 
@@ -510,23 +583,17 @@ void split_list_x(const plist *l, plist *left, plist *right) {
   // TODO what if last left and first right are the same x
   int middle = plist_size(l) / 2;
 
-  printf("Splitting the original list by x: ");
-
-  plist_fprintf(stdout, "%.3f\n", l);
 
   for (int i = 0; i < plist_size(l); i++) {
     point newPoint;
 
     plist_get(l, i, &newPoint);
     if (i < middle) {
-      point_fprintf(stdout, "%.3f\n", &newPoint);
       plist_add_end(left, &newPoint);
     
-
     } 
     else 
     {
-      point_fprintf(stdout, "%.3f\n", &newPoint);
       plist_add_end(right, &newPoint);
 
     }
@@ -570,7 +637,6 @@ void split_list_y(const plist *l, const plist *x_left, const plist *x_right,
 
 
 void make_middle(const plist *list_y, plist *middle, double left, double right) {
-  printf("MIDDLE STRIP: number must be bigger than %f and smaller than %f \n", left, right);
   for (int i = 0; i < plist_size(list_y); i++) {
     point pointElement;
 
@@ -662,6 +728,83 @@ void updateSmallestDistance(double *d, point *p1, point *p2, double smallerDista
   *d = smallerDistance;
   *p1 = *new_p1;
   *p2 = *new_p2;
+}
+
+
+bool read_single_float(char *float_string, float *floaty, int *size, 
+  bool *isNegative, bool *hasDecimalCase, FILE *stream) {
+
+  char iterator;
+
+  // ignore the first newline, unless EOF. In that case, return
+  if ((iterator = getc(stream)) == EOF) {
+    return false;
+  }
+
+
+  // skips whitespace before x 
+  while (!isdigit(iterator = getc(stream))) {
+  
+    // only skip valid whitespaces, otherwise break functions
+    if (iterator != ' ' && iterator != '\t') {
+
+      // check for valid negative sign
+      if (iterator == '-') {
+        char supportIterator = getc(stream);
+
+        if (isdigit(supportIterator)) {
+          ungetc(supportIterator, stream);
+          *isNegative = true;
+          break;
+        }
+      } 
+      else 
+      {
+        //fprintf(stderr, "Error reading input line at char %c", iterator);
+        return false;
+      }    
+      
+    }
+  }
+
+
+  if (*isNegative) {
+    float_string[*size] = '-';
+    *size += 1;
+    float_string[*size] = '\0';
+  }
+  // else skip whitespace stopped because of a digit
+  else 
+  {
+    // unget first digit
+    ungetc(iterator, stream);
+    float_string[*size] = '\0';
+
+  }
+
+  // add characters to floatx string, ex: 4.500
+  while(isdigit(iterator = getc(stream)) ||
+   (iterator == '.' && !*hasDecimalCase)) {
+    //printf("current char is %c\n",iterator);
+    float_string[*size] = iterator;
+    *size += 1;
+    float_string[*size] = '\0';
+
+    if (iterator == '.') {
+      *hasDecimalCase = true;
+    }
+    printf("BOOGA current char is %c\n", iterator);
+  }
+
+  // unget last char that is not a digit of float x
+  printf("lastchar is %c\n", iterator);
+  ungetc(iterator, stream);
+
+  // convert string into a float
+  *floaty = atof(float_string);
+
+  printf("float x is %f and original string is %s\n", *floaty, float_string);
+  return true;
 }
 
 
