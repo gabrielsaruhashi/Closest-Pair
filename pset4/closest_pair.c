@@ -4,6 +4,8 @@
 #include <math.h>
 #include <assert.h>
 #include <ctype.h>
+#include <float.h>
+
 
 #include "point.h"
 #include "plist.h"
@@ -171,25 +173,33 @@ int main(int argc, char **argv)
 
   // read into one list
   read_points(stdin, list_x, n);
-
   // TODO scheck if all points were valid
   if (plist_size(list_x) < n) {
     fprintf(stderr, "At main: Error reading inputs\n");
     return 3;
   }
 
+
   // sort list
   plist_sort(list_x, point_compare_x);
+  printf("Sorted: ");
+  plist_fprintf(stdout, "%.3f\n", list_x);
 
   // check for distinctness, ensure no repeated points
   
   // make list_y a copy of list_x
   copy_list(list_y, list_x);
+  printf("Copied list_y: ");
+  plist_fprintf(stdout, "%.3f\n", list_y);
+
+
   
   if (plist_size(list_y) == n)
     {
       // sort the y-list
       plist_sort(list_y, point_compare_y);
+      printf("Sorted list_y: ");
+      plist_fprintf(stdout, "%.3f\n", list_y);
       
       point p1, p2;
       double d;
@@ -219,32 +229,52 @@ void closest_pair(const plist *list_x, const plist *list_y, point *p1, point *p2
     }
 
   // make left/right lists
-  plist *x_left = NULL, *x_right = NULL, *y_left = NULL, *y_right = NULL;
+  plist *x_left = plist_create(), *x_right = plist_create(), *y_left = plist_create(), *y_right = plist_create();
   
   // populate left/right lists
   split_list_x(list_x, x_left, x_right);
+
+  //TODO erase
+  printf("x_left: ");
+  plist_fprintf(stdout, "%.3f\n", x_left);
+  printf("x_right: ");
+  plist_fprintf(stdout, "%.3f\n", x_right);
+
   split_list_y(list_y, x_left, x_right, y_left, y_right);
+
+  printf("y_left: ");
+  plist_fprintf(stdout, "%.3f\n", y_left);
+  printf("y_right: ");
+  plist_fprintf(stdout, "%.3f\n", y_right);
   
   // recursively find closest pair in two halves and keep the closer of those
   point p1_left, p2_left;
-  double d_left;
+  double d_left = DBL_MAX;
   closest_pair(x_left, y_left, &p1_left, &p2_left, &d_left);
   
   point p1_right, p2_right;
-  double d_right;
+  double d_right = DBL_MAX;
   closest_pair(x_right, y_right, &p1_right, &p2_right, &d_right);
 
   // determine which pair is closer together
+  printf("d_left is %f while d_right is %f\n", d_left, d_right);
   *d = (d_right > d_left) ? d_right : d_left;
 
+  // TODO delete
+  printf("final left points are: ");
+  point_fprintf(stdout, "%.3f\n", &p1_left);
+
+  point_fprintf(stdout, "%.3f\n", &p2_left);
+  printf("final right points are");
+  point_fprintf(stdout, "%.3f\n", &p1_right);
+   point_fprintf(stdout, "%.3f\n", &p2_right);
+
   // mid is the average of x-coordinate of last element of x_left and first element of x_right
-  point left_last, right_first;
-  plist_get(x_left, plist_size(x_left) - 1, &left_last);
-  plist_get(x_right, plist_size(x_right) - 1, &right_first);
-  double mid = (left_last.x - right_first.x) / 2;
+  double mid = ((p1_right.x - p2_left.x) / 2.0) + p2_left.x;
+  printf("dividing mid line is %f\n", mid);
 
   // create the list of points in the middle
-  plist *middle = NULL;
+  plist *middle = plist_create();
   
   // populate that list
   make_middle(list_y, middle, mid - *d, mid + *d);
@@ -259,10 +289,10 @@ void closest_pair(const plist *list_x, const plist *list_y, point *p1, point *p2
 // * before p2, and 0 if they are the same
 int point_compare_x(const point *p1, const point *p2) {
   if (p1->x > p2->x) {
-    return -1;
+    return 1;
   } 
   else if (p1->x < p2->x) {
-    return 1;
+    return -1;
   } 
   // if they are the same, return 0
   else {
@@ -384,7 +414,6 @@ void read_points(FILE *stream, plist *l, int n) {
 
     // skip all trailing whitespace until newline or EOF
     while ((iterator = getc(stream)) != '\n' && iterator != EOF) {
-     printf("here with char %c\n", iterator);
 
       // ignore trailing whitespace until you can move to new line
       if (iterator != ' ' && iterator != '\t') {
@@ -395,13 +424,12 @@ void read_points(FILE *stream, plist *l, int n) {
 
     // if last iteration
     if (i == n - 1) {
-      printf("returning");
+      printf("last iteration at %i\n", i);
       return;
     }
     // unget newline or EOF for next iteration
     else 
     {
-      printf("i is %i\n", i);
       ungetc(iterator, stream);
     }
   }
@@ -411,14 +439,17 @@ void read_points(FILE *stream, plist *l, int n) {
 // CHECK
 void copy_list(plist *dest, const plist* source) {
 
+
   for (int i = 0; i < plist_size(source); i++) 
   {
-    point *newPoint = NULL;
+    point newPoint;
 
     // get point i from source
-    plist_get(source, i, newPoint);
+    plist_get(source, i, &newPoint);
+
+
     // add to end of dest
-    plist_add_end(dest, newPoint);
+    plist_add_end(dest, &newPoint);
   }
   
   plist_set_size(dest, plist_size(source));
@@ -429,8 +460,8 @@ void closest_pair_brute_force(const plist *l, point *p1, point *p2, double *d) {
 
   int size = plist_size(l); 
   double distance_temp;
-  point *p1_temp = NULL;
-  point *p2_temp = NULL;
+  point p1_temp;
+  point p2_temp;
 
 
   // brute force compare each element
@@ -438,25 +469,28 @@ void closest_pair_brute_force(const plist *l, point *p1, point *p2, double *d) {
 
     for (int j = i + 1; j < size; j++ ) {
 
-      plist_get(l, i, p1_temp);
-      plist_get(l, j, p2_temp);
+      plist_get(l, i, &p1_temp);
+      plist_get(l, j, &p2_temp);
       // check distance
-      distance_temp = point_distance(p1_temp, p2_temp);
+      distance_temp = point_distance(&p1_temp, &p2_temp);
 
       // if first iteration, or these set of points is closer to each other than the current one
-      if (distance_temp < *d || i == 0) 
+      if (distance_temp < *d) 
       {
         *d = distance_temp;
-        *p1 = *p1_temp;
-        *p2 = *p2_temp;
+        *p1 = p1_temp;
+        *p2 = p2_temp;
+        printf("News smallest Distance is %f with points\n", *d);
+        point_fprintf(stdout, "%.3f\n", p1);
+        point_fprintf(stdout, "%.3f\n", p2);
+
       }
 
     }
   }
 
-  // free support variables
-  free(p1_temp);
-  free(p2_temp);
+
+
 
 
 }
@@ -465,18 +499,24 @@ void split_list_x(const plist *l, plist *left, plist *right) {
   // TODO what if last left and first right are the same x
   int middle = plist_size(l) / 2;
 
-  for (int i = 0; i < plist_size(l); i++) {
-    point *newPoint = NULL;
+  printf("Splitting the original list by x: ");
 
-    plist_get(l, i, newPoint);
+  plist_fprintf(stdout, "%.3f\n", l);
+
+  for (int i = 0; i < plist_size(l); i++) {
+    point newPoint;
+
+    plist_get(l, i, &newPoint);
     if (i < middle) {
-      plist_add_end(left, newPoint);
+      point_fprintf(stdout, "%.3f\n", &newPoint);
+      plist_add_end(left, &newPoint);
     
 
     } 
     else 
     {
-      plist_add_end(right, newPoint);
+      point_fprintf(stdout, "%.3f\n", &newPoint);
+      plist_add_end(right, &newPoint);
 
     }
   }
@@ -488,34 +528,32 @@ void split_list_y(const plist *l, const plist *x_left, const plist *x_right,
 {
 
   // get last element of x-left
-  point *last_x_left = NULL;
-  point *first_x_right = NULL;
-  plist_get(x_left, plist_size(x_left) - 1, last_x_left);
-  plist_get(x_right, 0, first_x_right);
+  point last_x_left;
+  point first_x_right;
+  plist_get(x_left, plist_size(x_left) - 1, &last_x_left);
+  plist_get(x_right, 0, &first_x_right);
 
   // get middle x value
-  float middle = (last_x_left->x + first_x_right->x) / 2;
+  float middle = (last_x_left.x + first_x_right.x) / 2;
   int size = plist_size(l);
 
   for (int i = 0; i < size; i++) 
   {
-    point *nextPoint = NULL;
+    point nextPoint;
     // get the point at index i of y_list
-    plist_get(l, i, nextPoint);
+    plist_get(l, i, &nextPoint);
 
-    if (nextPoint->x <= middle) 
+    if (nextPoint.x <= middle) 
     {
-      plist_add_end(y_left, nextPoint);
+      plist_add_end(y_left, &nextPoint);
     } 
     else 
     {
-      plist_add_end(y_right, nextPoint);
+      plist_add_end(y_right, &nextPoint);
     }
 
   }
 
-  free(last_x_left);
-  free(first_x_right);
   
 }
 

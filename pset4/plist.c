@@ -44,7 +44,6 @@ bool plist_add_end(plist *l, const point *p) {
   if (plist_size(l) == l->capacity) {
 
     int largerCap = l->capacity * 2;
-
     // duplicate
      point *largerPointsArray = realloc(l->pointsArray, sizeof(point) * largerCap);
 
@@ -62,10 +61,10 @@ bool plist_add_end(plist *l, const point *p) {
   // just add
   if (plist_size(l) < l->capacity)
   {
-    printf("here2 with size %i and capacity %i\n", l->size, l->capacity);
+    //printf("here2 with size %i and capacity %i\n", l->size, l->capacity);
 
     l->pointsArray[plist_size(l)] = *p;
-    printf("im here");
+   // printf("im here\n");
     l->size++;
     //printf("it's here with size %i\n", plist_size(l));
 
@@ -108,16 +107,24 @@ void plist_fprintf(FILE *stream, const char *fmt, const plist *l) {
     char *formatter = malloc(sizeof(char) * strlen(fmt));
 
     // strip the \n from the formatter, if any
-    for (int i = 0; i < strlen(fmt); i++) {
+    /*for (int i = 0; i < (int) strlen(fmt); i++) {
       if (fmt[i] == '\n') 
       {
          strncpy(formatter, fmt, strlen(fmt) - 1);
 
       }
+    } */
+
+    if (fmt[strlen(fmt) - 1] == '\n') {
+      strncpy(formatter, fmt, strlen(fmt) - 1);
     }
+
+    int len = strlen(formatter);
+    // add null terminator
+    formatter[len] = '\0';
     
     int size = plist_size(l);
-    fprintf(stream, "%c ", '[');
+    fprintf(stream, "%c", '[');
     for (int i = 0; i < size; i++) 
     {
       point currentPoint;
@@ -131,6 +138,8 @@ void plist_fprintf(FILE *stream, const char *fmt, const plist *l) {
     }
 
     fprintf(stream, "%c\n ", ']');
+
+    free(formatter);
 
 
     
