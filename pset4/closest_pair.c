@@ -182,15 +182,20 @@ int main(int argc, char **argv)
 
   // sort list
   plist_sort(list_x, point_compare_x);
+  /*
   printf("Sorted: ");
   plist_fprintf(stdout, "%.3f\n", list_x);
+  */
 
   // check for distinctness, ensure no repeated points
   
   // make list_y a copy of list_x
   copy_list(list_y, list_x);
+
+  /*
   printf("Copied list_y: ");
   plist_fprintf(stdout, "%.3f\n", list_y);
+  */
 
 
   
@@ -198,8 +203,10 @@ int main(int argc, char **argv)
     {
       // sort the y-list
       plist_sort(list_y, point_compare_y);
+      /*
       printf("Sorted list_y: ");
       plist_fprintf(stdout, "%.3f\n", list_y);
+      */
       
       point p1, p2;
       double d;
@@ -278,6 +285,10 @@ void closest_pair(const plist *list_x, const plist *list_y, point *p1, point *p2
   
   // populate that list
   make_middle(list_y, middle, mid - *d, mid + *d);
+
+  //TODO delete
+  printf("Middle strip points are");
+  plist_fprintf(stdout, "%.3f\n", middle);
 
   // search the list of points in middle for a closer pair
   search_middle(middle, p1, p2, d);
@@ -559,20 +570,16 @@ void split_list_y(const plist *l, const plist *x_left, const plist *x_right,
 
 
 void make_middle(const plist *list_y, plist *middle, double left, double right) {
-
+  printf("MIDDLE STRIP: number must be bigger than %f and smaller than %f \n", left, right);
   for (int i = 0; i < plist_size(list_y); i++) {
-    point *pointElement = NULL;
+    point pointElement;
 
-    plist_get(list_y, i, pointElement);
+    plist_get(list_y, i, &pointElement);
 
     // add every point that is within the range
-    if (pointElement->x >= left && pointElement->x <= right) {
+    if (pointElement.x >= left && pointElement.x <= right) {
       // adds to end and updates size
-      plist_add_end(middle, pointElement);
-    }
-    else
-    {
-      free(pointElement);
+      plist_add_end(middle, &pointElement);
     }
   }
 
@@ -585,46 +592,46 @@ void search_middle(const plist *middle, point *p1, point *p2, double *d) {
   // list must be ordered by Y
   int size = plist_size(middle);
   // support variables
-  point *initialPoint = NULL;
-  point *nextPoint = NULL;
+  point initialPoint;
+  point nextPoint;
   
   for (int i = 0; i < size - 1; i++) {
     
-    plist_get(middle, i, initialPoint);
+    plist_get(middle, i, &initialPoint);
     for (int j = i + 1; j < size; j++) 
     {
 
       // getting the nextPoint
-      plist_get(middle, j, nextPoint);
+      plist_get(middle, j, &nextPoint);
       // check if point is a feasible smaller distance
-      if (is_feasible_point(initialPoint->y, nextPoint->y, d)) 
+      if (is_feasible_point(initialPoint.y, nextPoint.y, d)) 
       {
-        double distance = point_distance(initialPoint, nextPoint);
+        double distance = point_distance(&initialPoint, &nextPoint);
 
         // if distance is smaller d
         if (distance < *d) 
         {
           // if same x, order by lowest y-coordinate
-          if (initialPoint->x == nextPoint->x) 
+          if (initialPoint.x == nextPoint.x) 
           {
 
-            if (initialPoint->y < nextPoint->y) 
+            if (initialPoint.y < nextPoint.y) 
             {
-              updateSmallestDistance(d, p1, p2, distance, initialPoint, nextPoint);
+              updateSmallestDistance(d, p1, p2, distance, &initialPoint, &nextPoint);
             }
             else 
             {
-              updateSmallestDistance(d, p1, p2, distance, nextPoint, initialPoint);
+              updateSmallestDistance(d, p1, p2, distance, &nextPoint, &initialPoint);
 
             }
           }
-          else if (initialPoint->x < nextPoint->x) 
+          else if (initialPoint.x < nextPoint.x) 
           {
-            updateSmallestDistance(d, p1, p2, distance, initialPoint, nextPoint);
+            updateSmallestDistance(d, p1, p2, distance, &initialPoint, &nextPoint);
           }
           else 
           {
-            updateSmallestDistance(d, p1, p2, distance, nextPoint, initialPoint);
+            updateSmallestDistance(d, p1, p2, distance, &nextPoint, &initialPoint);
 
           }
         }
@@ -637,10 +644,7 @@ void search_middle(const plist *middle, point *p1, point *p2, double *d) {
 
     }
   }
-  // free support variables
-  free(initialPoint);
-  free(nextPoint);
-  
+
 }
 
 bool is_feasible_point(int initial_y, int next_y, const double *d) {
