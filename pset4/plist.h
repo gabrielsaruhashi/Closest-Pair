@@ -11,7 +11,7 @@
 
 
 struct point;
-//struct plist;
+struct plist;
 
 // check this
 typedef struct plist plist;

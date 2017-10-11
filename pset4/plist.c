@@ -1,6 +1,6 @@
 
 #include "plist.h"
-
+#define PLIST_INITIAL_SIZE 2
 
 struct plist {
   int size;

@@ -16,6 +16,7 @@ int main(int argc, char **argv)
       return 0;
     }
   
+
   point p1 = {6.0, 3.0};
   point p2 = {2.0, 5.0};
   point p3 = {0.0, 0.0};
