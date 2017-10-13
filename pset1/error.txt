@@ -1,4 +1,0 @@
-/*comments @cpsc203!>>*/
-oi
-
-/*hello @cs203 hello*/
