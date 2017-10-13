@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <string.h>
 
 #include "plist.h"
 #define PLIST_INITIAL_SIZE 2
@@ -8,8 +10,10 @@ struct plist {
   point *pointsArray;
 };
 
-// return a pointer to plist
+// return a pointer to newly made plist
 plist *plist_create() {
+
+  // declare variables
   plist *newPlist;
   point *newPointsArray;
 
@@ -28,48 +32,53 @@ plist *plist_create() {
   return newPlist;
 }
 
+
 // frees all memory
 void plist_destroy(plist *l) {
+  // frees array
   free(l->pointsArray);
+
+  // frees pointer to array
   free(l);
 }
 
 
 int plist_size(const plist *l) {
+  // return the size property
   return l->size;
 }
 
 bool plist_add_end(plist *l, const point *p) {
+
   // if plist has reached its capacity, double the capacity and reallocate the array
   if (plist_size(l) == l->capacity) {
 
+    // double capacity
     int largerCap = l->capacity * 2;
-    // duplicate
+
+    // reallocate points memory block to the larger memory block
      point *largerPointsArray = realloc(l->pointsArray, sizeof(point) * largerCap);
 
+    // ensure reallocation worked correctly
     if (largerPointsArray != NULL ){
+
         // update array and capacity
         l->pointsArray = largerPointsArray;
         l->capacity = largerCap;
     } 
+    // else something went wrong
     else
     {
       return false;
     }
   
   }
-  // just add
+
+  // add point to the end of plist and increase size
   if (plist_size(l) < l->capacity)
   {
-    //printf("here2 with size %i and capacity %i\n", l->size, l->capacity);
-
     l->pointsArray[plist_size(l)] = *p;
-   // printf("im here\n");
     l->size++;
-    //printf("it's here with size %i\n", plist_size(l));
-
-    //point_fprintf(stdout, "%.3f\n", &l->pointsArray[plist_size(l) - 1]);
-
   }
 
   return true;
@@ -78,6 +87,7 @@ bool plist_add_end(plist *l, const point *p) {
 
 void plist_get(const plist *l, int i, point *p) {
 
+  // populate pointer
   *p = l->pointsArray[i];
 
 }
@@ -85,11 +95,13 @@ void plist_get(const plist *l, int i, point *p) {
 bool plist_contains(const plist *l, const point *p) 
 {
 
+  // iterate through plist l to check for the point 
   for (int i = 0; i < l->size; i++) {
 
     // get the reference for the point in the array
     point *pointObject = &l->pointsArray[i];
 
+    // check for equality
     if (pointObject->x == p->x && pointObject->y == p->y) 
     {
       return true;
@@ -103,28 +115,23 @@ bool plist_contains(const plist *l, const point *p)
 
 void plist_fprintf(FILE *stream, const char *fmt, const plist *l) {
     
-    // official formatter
+    // ensures that formatter *fmt does not have \n
     char *formatter = malloc(sizeof(char) * strlen(fmt));
 
-    // strip the \n from the formatter, if any
-    /*for (int i = 0; i < (int) strlen(fmt); i++) {
-      if (fmt[i] == '\n') 
-      {
-         strncpy(formatter, fmt, strlen(fmt) - 1);
-
-      }
-    } */
-
+    // copy fmt to formatter
     if (fmt[strlen(fmt) - 1] == '\n') {
       strncpy(formatter, fmt, strlen(fmt) - 1);
     }
 
     int len = strlen(formatter);
+
     // add null terminator
     formatter[len] = '\0';
     
     int size = plist_size(l);
     fprintf(stream, "%c", '[');
+
+    // print all the points, separated by commas
     for (int i = 0; i < size; i++) 
     {
       point currentPoint;
@@ -139,6 +146,7 @@ void plist_fprintf(FILE *stream, const char *fmt, const plist *l) {
 
     fprintf(stream, "%c\n ", ']');
 
+    // free the memory block
     free(formatter);
 
 
@@ -146,20 +154,8 @@ void plist_fprintf(FILE *stream, const char *fmt, const plist *l) {
 }
 
 void plist_sort(plist *l, int (*compare)(const point* point1, const point* point2)) {
- // cast it
+ // cast function pointer parameters to void in order to use qsort
  qsort(l->pointsArray, l->size, sizeof(point), (int (*) (const void *, const void *)) compare);
-}
-
-void plist_set_size(plist *l, int size_) {
-  l->size = size_;
-}
-
-int plist_capacity(const plist *l) {
-  return l->capacity;
-}
-
-void plist_set_capacity(plist *l, int capacity_) {
-  l->capacity = capacity_;
 }
 
 

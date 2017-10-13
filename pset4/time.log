@@ -17,11 +17,17 @@ Date  Started  Spent Work completed
 
 9/05  8:00pm   3:00 worked on the implementation of closest_pair's search_middle  
 
-9/06  2:00pm.  1:30 fixed some bugs of read_points                  
+9/06  2:00pm.  1:30 fixed some bugs of read_points    
+
 9/08  9:00am   2:00 all functions, but make middle and search middle are working 
+9/10  10:30pm  0:30 fixed one last bug with code, I was not saving the points correctly
+09/12 3:30pm   0:30 writing descriptive comments explaining functions
                ----
-               15:00  TOTAL time spent
+               16:15  TOTAL time spent
 
 I discussed my solution with: Sarim Abbas.
 
-Breaking down the problem and thinking about all the edge cases was very challenging at first. First, because I was not very familiar with C, which made it hard to think of possible approaches to tackle the program. Second, I did not really plan and sketch out my solution before starting to code, which forced me to redo my work whenever I remembered of a detail or specification that I had forgotten to consider. My lack of attention made me lose about 5 hours working on the wrong solution with pointers. I would not say, though, that it was a waste of time because I was able to learn a lot about memory allocation, arrays, and string handling in C. After Dr Glenn introduced the concept of Finite State Machines, it was easier to break down all th cases, but I still had a lot of difficulty to address all the particularities of the PSET. Moreover, as I was using While loops with breaks, it was sometimes hard to keep track of everything that was going on.
+
+Understanding the file structure was very challenging at first. As Doctor Glenn gave us the entire main function and the prototypes for the function, I spent the initial two hours reading through the entire documentation and going line by line to understand what each part was doing. Moreover, as I was not that comfortable with the concept of opaque lists, it was difficult for me to implement the functions at closest.pair.c. I ended up implementing all the functions the wrong way, trying to access the structure plist directly instead of using the methods Dr. Glenn gave us.
+Moreover, one the most challenging parts of the problem set was definitely understanding how to keep the algorithm at O(n). The logic for search middle was very intricate at first because I had not fully visualized what was going on in the code.
+The other major problem was that I forgot to update the points after my recursive calls to left and right returned with the initial smallest distance. That led to some weird behavior in my ouputs that made me lose a couple of hours trying to figure out what was wrong.

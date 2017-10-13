@@ -3,17 +3,10 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
-
 
 #include "point.h"
 
-
-struct point;
 struct plist;
-
-// check this
 typedef struct plist plist;
 
 /**
@@ -24,8 +17,7 @@ typedef struct plist plist;
 plist *plist_create();
 
 /**
- * Destroys the given list.  The space occupied by the list and all
- * its elements is released.
+ * Destroys the given list.  The list is invalid after it has been destroyed.
  *
  * @param l a pointer to a list, non-NULL
  */
@@ -53,7 +45,7 @@ bool plist_add_end(plist *l, const point *p);
  * given point.  There is no effect if the index is not valid.
  *
  * @param l a pointer to a list, non-NULL
- * @param i an integer
+ * @param i an index into l
  * @param p a pointer to a point, non-NULL
  */
 void plist_get(const plist *l, int i, point *p);
@@ -68,14 +60,11 @@ void plist_get(const plist *l, int i, point *p);
 bool plist_contains(const plist *l, const point *p);
 
 /**
- * Prints the given list to the given stream using the given format
- * for each point.  If there is a newline at the end of the format
- * specifier then that newline is printed once at the end of the list.
- * The list will be enclosed in square brackets and each point in the
- * list will be output in the format printed by
- * <code>point_fprintf</code> when passed the format specifier with
- * the trailing newline removed.  Points will be separated by a comma
- * and a single space.
+ * Prints the given list to the given stream using the given format for
+ * each point.  If there is a newline at the end of the format specifier
+ * then that newline is printed only once at the end of the list.  The
+ * contents of the list are enclosed in [] and each item is separated by
+ * a comma and a single space.
  *
  * @param stream a pointer to astream, non-NULL
  * @param fmt a format specifier string, non-NULL
@@ -86,20 +75,12 @@ void plist_fprintf(FILE *stream, const char *fmt, const plist *l);
 /**
  * Sorts the given list using the given comparator.
  *
- * @param l a pointer to a list, non-NULL
+ * @param l a pointer to a list
  * @param compare a pointer to a function that returns a negative
  * number to indicate the first point comes before the second, a
  * positive number to indicate the second point comes before the
  * first, and zero if the have the same ordinal value.
  */
 void plist_sort(plist *l, int (*compare)(const point*, const point*));
-
-void plist_set_size(plist *l, int size_);
-
-int plist_capacity(const plist *l);
-
-void plist_set_capacity(plist *l, int capacity_);
-
-
 
 #endif

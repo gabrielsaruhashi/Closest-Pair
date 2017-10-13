@@ -48,7 +48,7 @@ void read_points(FILE *stream, plist *l, int n);
 
 /**
  * Copies the points from the source list to the destination list
- * in the order they appear in the destination list.
+ * in the order they appear in the source list.
  *
  * @param dest a pointer to a list, non-NULL
  * @param source a pointer to a list, non-NULL
@@ -135,13 +135,47 @@ void make_middle(const plist *list_y, plist *middle, double left, double right);
  */
 void search_middle(const plist *middle, point *p1, point *p2, double *d);
 
+/**
+* Based on the y-coordinates, 
+* checks if it is possible that two points are closer to each other
+* than the current smallest distance
+*
+* @param initial_y y-coordinate of one of the points being assessded
+* @param next_y y-coordinate of the other point being assessed 
+* @param d a pointer to the value of the smallest distance
+*/
 bool is_feasible_point(int initial_y, int next_y, const double *d);
 
+/** 
+* Updates the smallest distance
+* 
+* @param d a pointer to the smallest distance seen so far in main()
+* @param p1 a pointer to one of the two points that are closes to each other
+* @param p2 a pointer to one of the two points that are closes to each other
+* @param smallerDistance double representing the new smallest distance
+* @param new_p1 one of the two points that have the new smallest distance
+* @param new_p2 one of the two points that have the new smallest distance
+*/
 void updateSmallestDistance(double *d, point *p1, point *p2, 
-      double smallerDistance, point *new_p1, point *new_p2);
+      double smallerDistance, point new_p1, point new_p2);
 
+/**
+* Given an input stream, reads a float chacter by character to ensure
+* there are no invalid sequences
+*
+* @param floaty, a pointer to the float in main()
+* @param stream, a pointer to an input stream
+* @return true if float was read correctly, false otherwise
+*/
 bool read_single_float(float *floaty, FILE *stream);
 
+/**
+* Searches an ordered list of points for any repeated points
+*
+* @param plist a pointer to a list of points to be checked
+* @param stream a pointer to an input stream
+* @return true if list has any repetitions, false otherwise
+*/
 bool hasRepetitions(const plist *list, int size);
 
 int main(int argc, char **argv)
@@ -177,8 +211,9 @@ int main(int argc, char **argv)
 
   // read into one list
   read_points(stdin, list_x, n);
-  // TODO scheck if all points were valid
-  if (plist_size(list_x) < n) {
+
+  // checks if all points were valid and that there at least two points
+  if (plist_size(list_x) < n || plist_size(list_x) < 2) {
     fprintf(stderr, "At main: Error reading inputs. Expected size %i, but there were %i valid elements\n", n, plist_size(list_x));
     return 3;
   }
@@ -237,18 +272,7 @@ void closest_pair(const plist *list_x, const plist *list_y, point *p1, point *p2
   // populate left/right lists
   split_list_x(list_x, x_left, x_right);
 
-  /*TODO erase
-  printf("x_left: ");
-  plist_fprintf(stdout, "%.3f\n", x_left);
-  printf("x_right: ");
-  plist_fprintf(stdout, "%.3f\n", x_right); */
-
   split_list_y(list_y, x_left, x_right, y_left, y_right);
-
-  /*printf("y_left: ");
-  plist_fprintf(stdout, "%.3f\n", y_left);
-  printf("y_right: ");
-  plist_fprintf(stdout, "%.3f\n", y_right); */
   
   // recursively find closest pair in two halves and keep the closer of those
   point p1_left, p2_left;
@@ -263,26 +287,15 @@ void closest_pair(const plist *list_x, const plist *list_y, point *p1, point *p2
   if (d_left <= d_right) {
     *d = d_left;
     *p1 = p1_left;
-    *p2 = p2_left; 
-
-
+    *p2 = p2_left;
   }
 
-  else {
+  else 
+  {
     *d = d_right;
     *p1 = p1_right;
     *p2 = p2_right; 
   }
- 
-
-  /*TODO delete
-  printf("final left points are: ");
-  point_fprintf(stdout, "%.3f\n", &p1_left);
-
-  point_fprintf(stdout, "%.3f\n", &p2_left);
-  printf("final right points are");
-  point_fprintf(stdout, "%.3f\n", &p1_right);
-   point_fprintf(stdout, "%.3f\n", &p2_right); */
 
   // mid is the average of x-coordinate of last element of x_left and first element of x_right
   double mid = ((p1_right.x - p2_left.x) / 2.0) + p2_left.x;
@@ -294,14 +307,16 @@ void closest_pair(const plist *list_x, const plist *list_y, point *p1, point *p2
   // populate that list
   make_middle(list_y, middle, mid - *d, mid + *d);
 
-  //TODO delete
-  printf("Middle strip points are");
-  plist_fprintf(stdout, "%.3f\n", middle); 
 
   // search the list of points in middle for a closer pair
   search_middle(middle, p1, p2, d);
 
   // clean up, free all the points
+  plist_destroy(middle);
+  plist_destroy(x_left);
+  plist_destroy(x_right);
+  plist_destroy(y_left);
+  plist_destroy(y_right);
 }
 
 // @return a negative number if p1 comes before p2, positive if p1 comes
@@ -381,7 +396,7 @@ void read_points(FILE *stream, plist *l, int n) {
 
 }
 
-// CHECK
+
 void copy_list(plist *dest, const plist* source) {
 
 
@@ -397,26 +412,27 @@ void copy_list(plist *dest, const plist* source) {
     plist_add_end(dest, &newPoint);
   }
   
-  plist_set_size(dest, plist_size(source));
-  plist_set_capacity(dest, plist_capacity(source));
 }
 
 void closest_pair_brute_force(const plist *l, point *p1, point *p2, double *d) {
 
+  // initialize support variables
   int size = plist_size(l); 
   double distance_temp;
   point p1_temp;
   point p2_temp;
 
 
-  // brute force compare each element
+  // brute force compare each element in plist l
   for (int i = 0; i < size - 1; i++) {
 
     for (int j = i + 1; j < size; j++ ) {
 
+      // get consecutive points
       plist_get(l, i, &p1_temp);
       plist_get(l, j, &p2_temp);
-      // check distance
+
+      // check distance between them
       distance_temp = point_distance(&p1_temp, &p2_temp);
 
       // if first iteration, or these set of points is closer to each other than the current one
@@ -506,6 +522,7 @@ void make_middle(const plist *list_y, plist *middle, double left, double right) 
     }
   }
 
+
 }
 
 //TODO
@@ -518,8 +535,7 @@ void search_middle(const plist *middle, point *p1, point *p2, double *d) {
   point initialPoint;
   point nextPoint;
 
-  plist_fprintf(stdout, "%.3f", middle);
-  
+
   for (int i = 0; i < size - 1; i++) {
     
     plist_get(middle, i, &initialPoint);
@@ -537,41 +553,26 @@ void search_middle(const plist *middle, point *p1, point *p2, double *d) {
         if (distance < *d) 
         {
 
-          printf("Old smallest distance is %f. New smallest distance is %f and points are:", *d, distance);
-          point_fprintf(stdout, "%.3f", &initialPoint);
-          point_fprintf(stdout, "%.3f", &nextPoint);
-          printf("\n");
           // if same x, order by lowest y-coordinate
           if (initialPoint.x == nextPoint.x) 
           {
-            printf(".x of new smallest distance are equal\n");
-             point_fprintf(stdout, "%.3f", &initialPoint);
-              point_fprintf(stdout, "%.3f", &nextPoint);
-
             if (initialPoint.y < nextPoint.y) 
             {
-              updateSmallestDistance(d, p1, p2, distance, &initialPoint, &nextPoint);
+              updateSmallestDistance(d, p1, p2, distance, initialPoint, nextPoint);
             }
             else 
             {
-              updateSmallestDistance(d, p1, p2, distance, &nextPoint, &initialPoint);
+              updateSmallestDistance(d, p1, p2, distance, nextPoint, initialPoint);
 
             }
           }
           else if (initialPoint.x < nextPoint.x) 
           {
-            printf(".x of new smallest distance are equal2\n");
-           point_fprintf(stdout, "%.3f", &initialPoint);
-            point_fprintf(stdout, "%.3f", &nextPoint);
-            updateSmallestDistance(d, p1, p2, distance, &initialPoint, &nextPoint);
+            updateSmallestDistance(d, p1, p2, distance, initialPoint, nextPoint);
           }
           else 
           {
-
-             printf(".x of new smallest distance are equal3\n");
-           point_fprintf(stdout, "%.3f", &initialPoint);
-            point_fprintf(stdout, "%.3f", &nextPoint);
-            updateSmallestDistance(d, p1, p2, distance, &nextPoint, &initialPoint);
+            updateSmallestDistance(d, p1, p2, distance, nextPoint, initialPoint);
 
           }
         }
@@ -598,11 +599,11 @@ bool is_feasible_point(int initial_y, int next_y, const double *d) {
   return true;
 }
 
-void updateSmallestDistance(double *d, point *p1, point *p2, double smallerDistance, point *new_p1, point *new_p2) {
+void updateSmallestDistance(double *d, point *p1, point *p2, double smallerDistance, point new_p1, point new_p2) {
   
   *d = smallerDistance;
-  *p1 = *new_p1;
-  *p2 = *new_p2;
+  *p1 = new_p1;
+  *p2 = new_p2;
 }
 
 
@@ -663,7 +664,6 @@ bool read_single_float(float *floaty, FILE *stream) {
   // add characters to floatx string, ex: 4.500
   while(isdigit(iterator = getc(stream)) ||
    (iterator == '.' && !hasDecimalCase)) {
-    //printf("current char is %c\n",iterator);
     float_string[size] = iterator;
     size += 1;
     float_string[size] = '\0';
